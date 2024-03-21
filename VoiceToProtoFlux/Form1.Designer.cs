@@ -28,8 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            label1 = new Label();
-            microphoneListBox = new ListBox();
+            defaultMicrophoneNameLabel = new Label();
             isAudioDetectedLabel = new Label();
             isAudioDetectionConfirmedLabel = new Label();
             rawTranscriptionListBox = new ListBox();
@@ -39,25 +38,14 @@
             interpretedTranscriptionListBox = new ListBox();
             SuspendLayout();
             // 
-            // label1
+            // defaultMicrophoneNameLabel
             // 
-            label1.AutoSize = true;
-            label1.Location = new Point(53, 29);
-            label1.Name = "label1";
-            label1.Size = new Size(115, 15);
-            label1.TabIndex = 0;
-            label1.Text = "Select a Microphone";
-            // 
-            // microphoneListBox
-            // 
-            microphoneListBox.FormattingEnabled = true;
-            microphoneListBox.ItemHeight = 15;
-            microphoneListBox.Items.AddRange(new object[] { "a", "b", "c" });
-            microphoneListBox.Location = new Point(53, 77);
-            microphoneListBox.Name = "microphoneListBox";
-            microphoneListBox.Size = new Size(404, 94);
-            microphoneListBox.TabIndex = 1;
-            microphoneListBox.SelectedIndexChanged += microphoneListBox_SelectedIndexChanged;
+            defaultMicrophoneNameLabel.AutoSize = true;
+            defaultMicrophoneNameLabel.Location = new Point(53, 29);
+            defaultMicrophoneNameLabel.Name = "defaultMicrophoneNameLabel";
+            defaultMicrophoneNameLabel.Size = new Size(103, 15);
+            defaultMicrophoneNameLabel.TabIndex = 0;
+            defaultMicrophoneNameLabel.Text = "Default Mic Name";
             // 
             // isAudioDetectedLabel
             // 
@@ -135,8 +123,7 @@
             Controls.Add(rawTranscriptionListBox);
             Controls.Add(isAudioDetectionConfirmedLabel);
             Controls.Add(isAudioDetectedLabel);
-            Controls.Add(microphoneListBox);
-            Controls.Add(label1);
+            Controls.Add(defaultMicrophoneNameLabel);
             Name = "Form1";
             Text = "Form1";
             Load += Form1_Load;
@@ -146,8 +133,7 @@
 
         #endregion
 
-        private Label label1;
-        private ListBox microphoneListBox;
+        private Label defaultMicrophoneNameLabel;
         private Label isAudioDetectedLabel;
         private Label isAudioDetectionConfirmedLabel;
         private ListBox rawTranscriptionListBox;

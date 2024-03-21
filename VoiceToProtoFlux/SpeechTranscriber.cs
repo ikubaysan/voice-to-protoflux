@@ -16,7 +16,9 @@ namespace VoiceToProtoFlux
         private readonly string[] phrases = {
             "hello", "testing",
             "dynamic", "impulse", "receiver", "trigger", "float", "integer",
-            "string", "data", "model", "store", "DynamicVariable", "DynamicImpulseReceiver", "DynamicImpulseTrigger"
+            "string", "data", "model", "store", "DynamicVariable", 
+            "DynamicImpulseReceiver", "DynamicImpulseTrigger",
+            "AsyncDynamicImpulseTrigger", "AsyncDynamicImpulseReceiver"
         };
 
         private Grammar ConstructCustomGrammar()

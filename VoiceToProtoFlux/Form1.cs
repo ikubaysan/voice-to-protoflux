@@ -4,7 +4,6 @@ using System.Drawing; // For changing label colors
 using System.Windows.Forms;
 using System.Linq;
 
-
 namespace VoiceToProtoFlux
 {
     public partial class Form1 : Form
@@ -12,40 +11,41 @@ namespace VoiceToProtoFlux
         private WaveInEvent? waveSource = null;
         private bool audioDetected = false;
         private SpeechTranscriber? speechTranscriber = null;
+        private string defaultMicrophoneName = "Unknown Microphone";
 
         public Form1()
         {
             InitializeComponent();
-            PopulateMicrophones();
+            IdentifyDefaultMicrophone();
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            // Initialize both labels to their default states
+            // Initialize labels to their default states
             isAudioDetectedLabel.Text = "Audio is not currently detected";
             isAudioDetectedLabel.ForeColor = Color.Red;
-            // Initialize isAudioDetectionConfirmedLabel
             isAudioDetectionConfirmedLabel.Text = "Audio detection not confirmed";
             isAudioDetectionConfirmedLabel.ForeColor = Color.Red;
+
+            // Update default microphone name label
+            defaultMicrophoneNameLabel.Text = $"Your default mic: {defaultMicrophoneName}";
         }
 
-        private void PopulateMicrophones()
+        private void IdentifyDefaultMicrophone()
         {
-            microphoneListBox.Items.Clear();
-            for (int n = 0; n < WaveIn.DeviceCount; n++)
+            if (WaveIn.DeviceCount == 0)
             {
-                var device = WaveIn.GetCapabilities(n);
-                microphoneListBox.Items.Add(device.ProductName);
+                MessageBox.Show("No microphones found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Close(); // Close the form if no microphones are found
+                return;
             }
-        }
 
-        private void microphoneListBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            StartListeningToMicrophone(microphoneListBox.SelectedIndex);
-            ResetAudioDetectionLabel();
-            // Also reset isAudioDetectionConfirmedLabel
-            isAudioDetectionConfirmedLabel.Text = "Audio detection not confirmed";
-            isAudioDetectionConfirmedLabel.ForeColor = Color.Red;
+            // Assuming the default microphone is always at index 0 (common but not guaranteed)
+            var defaultMic = WaveIn.GetCapabilities(0);
+            defaultMicrophoneName = defaultMic.ProductName;
+
+            // Automatically start listening to the default microphone
+            StartListeningToMicrophone(0);
         }
 
         private void StartListeningToMicrophone(int deviceNumber)
@@ -94,11 +94,6 @@ namespace VoiceToProtoFlux
             }
         }
 
-        private void ResetAudioDetectionLabel()
-        {
-            UpdateAudioDetectionLabel(false);
-        }
-
         private void UpdateAudioDetectionLabel(bool detected)
         {
             if (this.InvokeRequired)
@@ -107,13 +102,11 @@ namespace VoiceToProtoFlux
                 return;
             }
 
-            string micName = microphoneListBox.SelectedItem?.ToString() ?? "Unknown Microphone";
-
             if (detected)
             {
                 isAudioDetectedLabel.Text = "Audio is currently detected";
                 isAudioDetectedLabel.ForeColor = Color.Green;
-                isAudioDetectionConfirmedLabel.Text = $"Audio detection confirmed for {micName}.";
+                isAudioDetectionConfirmedLabel.Text = $"Audio detection confirmed for {defaultMicrophoneName}.";
                 isAudioDetectionConfirmedLabel.ForeColor = Color.Green;
 
                 // Initialize the speech transcriber once if not already started
@@ -127,15 +120,7 @@ namespace VoiceToProtoFlux
             {
                 isAudioDetectedLabel.Text = "Audio not currently detected";
                 isAudioDetectedLabel.ForeColor = Color.Red;
-
-                // Consider whether you want to stop recognition here or not.
-                // If you stop and dispose of the recognizer, you'll need to create a new instance when audio is detected again.
-                // This example does not stop the SpeechTranscriber instance but you could manage its lifecycle according to your needs.
             }
         }
-
-
-
-
     }
 }
