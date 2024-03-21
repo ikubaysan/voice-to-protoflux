@@ -11,32 +11,34 @@ namespace VoiceToProtoFlux
         private readonly List<string> transcriptionHistory = new List<string>();
         private readonly ListBox transcriptionListBox;
         private readonly CheckBox transcriptionEnabledCheckBox;
+        private readonly int MaxAlternatesCount = 5; // Specify the number of alternates to consider
+        private readonly List<ProtoFluxTypeInfo> protoFluxTypes;
 
-        // Define your specific phrases here
-        private readonly string[] phrases = {
-            "hello", "testing",
-            "dynamic", "impulse", "receiver", "trigger", "float", "integer",
-            "string", "data", "model", "store", "DynamicVariable", 
-            "DynamicImpulseReceiver", "DynamicImpulseTrigger",
-            "AsyncDynamicImpulseTrigger", "AsyncDynamicImpulseReceiver"
-        };
-
-        private Grammar ConstructCustomGrammar()
-        {
-            var choices = new Choices(phrases);
-            var gb = new GrammarBuilder(choices);
-            return new Grammar(gb);
-        }
-
-        public SpeechTranscriber(ListBox listBox, CheckBox checkBox)
+        public SpeechTranscriber(ListBox listBox, CheckBox checkBox, List<ProtoFluxTypeInfo> protoFluxTypes)
         {
             this.transcriptionListBox = listBox;
             this.transcriptionEnabledCheckBox = checkBox;
+            this.protoFluxTypes = protoFluxTypes;
 
             recognizer = new SpeechRecognitionEngine(new System.Globalization.CultureInfo("en-US"));
             recognizer.LoadGrammar(ConstructCustomGrammar());
+
+            recognizer.MaxAlternates = MaxAlternatesCount; // Set the maximum number of alternates
+
+            recognizer.EndSilenceTimeout = TimeSpan.FromSeconds(2);
+            recognizer.EndSilenceTimeoutAmbiguous = TimeSpan.FromSeconds(2);
+
             recognizer.SpeechRecognized += Recognizer_SpeechRecognized;
             recognizer.SetInputToDefaultAudioDevice();
+        }
+
+        private Grammar ConstructCustomGrammar()
+        {
+            // Assuming you have a method to extract phrases from protoFluxTypes
+            var phrases = protoFluxTypes.ConvertAll(typeInfo => typeInfo.NiceName);
+            var choices = new Choices(phrases.ToArray());
+            var gb = new GrammarBuilder(choices);
+            return new Grammar(gb);
         }
 
         public void StartRecognition()
@@ -49,19 +51,32 @@ namespace VoiceToProtoFlux
             recognizer.RecognizeAsyncStop();
         }
 
-        private void Recognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
+        private void Recognizer_SpeechRecognized(object? sender, SpeechRecognizedEventArgs e)
         {
             if (!transcriptionEnabledCheckBox.Checked) return;
 
-            // Directly use the recognized text since it's based on your custom grammar
-            string transcription = e.Result.Text;
+            // Initialize a StringBuilder to concatenate matches and their confidence
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
-            AddTranscription(transcription);
+            foreach (var alternate in e.Result.Alternates)
+            {
+                // Append each match and its confidence to the StringBuilder
+                sb.AppendFormat("{0} (Confidence: {1:N2}), ", alternate.Text, alternate.Confidence);
+            }
+
+            // Remove the last comma and space
+            if (sb.Length > 0)
+            {
+                sb.Remove(sb.Length - 2, 2);
+            }
+
+            // Call AddTranscription with the concatenated string of matches and confidences
+            AddTranscription(sb.ToString());
         }
 
         private void AddTranscription(string transcription)
         {
-            // Ensure operation is thread-safe
+            // Your existing thread-safe AddTranscription logic
             if (transcriptionListBox.InvokeRequired)
             {
                 transcriptionListBox.Invoke(new Action<string>(AddTranscription), new object[] { transcription });
@@ -69,17 +84,15 @@ namespace VoiceToProtoFlux
             else
             {
                 transcriptionHistory.Add(transcription);
-                // Keep only the last 5 messages
-                if (transcriptionHistory.Count > 5)
+                if (transcriptionHistory.Count > 10)
                 {
                     transcriptionHistory.RemoveAt(0);
                 }
 
-                // Update the ListBox
-                transcriptionListBox.Items.Clear(); // Make sure this operation is on the UI thread
+                transcriptionListBox.Items.Clear();
                 foreach (var item in transcriptionHistory)
                 {
-                    transcriptionListBox.Items.Add(item); // Add each item in the history
+                    transcriptionListBox.Items.Add(item);
                 }
             }
         }

@@ -12,6 +12,7 @@ namespace VoiceToProtoFlux
         private bool audioDetected = false;
         private SpeechTranscriber? speechTranscriber = null;
         private string defaultMicrophoneName = "Unknown Microphone";
+        private List<ProtoFluxTypeInfo> protoFluxTypes;
 
         public Form1()
         {
@@ -29,6 +30,16 @@ namespace VoiceToProtoFlux
 
             // Update default microphone name label
             defaultMicrophoneNameLabel.Text = $"Your default mic: {defaultMicrophoneName}";
+            List<ProtoFluxTypeInfo> protoFluxTypes = ProtoFluxTypeLoader.LoadProtoFluxTypes();
+
+            // Pass the loaded ProtoFlux types to the SpeechTranscriber
+            if (speechTranscriber == null)
+            {
+                speechTranscriber = new SpeechTranscriber(rawTranscriptionListBox, transcriptionEnabledCheckBox, protoFluxTypes);
+                speechTranscriber.StartRecognition();
+            }
+
+            return;
         }
 
         private void IdentifyDefaultMicrophone()
@@ -108,13 +119,6 @@ namespace VoiceToProtoFlux
                 isAudioDetectedLabel.ForeColor = Color.Green;
                 isAudioDetectionConfirmedLabel.Text = $"Audio detection confirmed for {defaultMicrophoneName}.";
                 isAudioDetectionConfirmedLabel.ForeColor = Color.Green;
-
-                // Initialize the speech transcriber once if not already started
-                if (speechTranscriber == null)
-                {
-                    speechTranscriber = new SpeechTranscriber(rawTranscriptionListBox, transcriptionEnabledCheckBox);
-                    speechTranscriber.StartRecognition();
-                }
             }
             else
             {
