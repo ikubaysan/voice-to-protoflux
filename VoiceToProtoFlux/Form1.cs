@@ -13,11 +13,20 @@ namespace VoiceToProtoFlux
         private SpeechTranscriber? speechTranscriber = null;
         private string defaultMicrophoneName = "Unknown Microphone";
         private List<ProtoFluxTypeInfo> protoFluxTypes;
+        private WebSocketServer webSocketServer;
 
         public Form1()
         {
             InitializeComponent();
             IdentifyDefaultMicrophone();
+            webSocketServer = new WebSocketServer("http://localhost:7159/"); // Connect with ws://localhost:7159/
+            Task.Run(() => webSocketServer.StartAsync()); // Start the WebSocket server asynchronously
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            base.OnFormClosing(e);
+            webSocketServer?.Stop();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -35,7 +44,7 @@ namespace VoiceToProtoFlux
             // Pass the loaded ProtoFlux types to the SpeechTranscriber
             if (speechTranscriber == null)
             {
-                speechTranscriber = new SpeechTranscriber(rawTranscriptionListBox, transcriptionEnabledCheckBox, protoFluxTypes);
+                speechTranscriber = new SpeechTranscriber(rawTranscriptionListBox, transcriptionEnabledCheckBox, protoFluxTypes, webSocketServer);
                 speechTranscriber.StartRecognition();
             }
 
