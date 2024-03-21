@@ -32,7 +32,11 @@
             microphoneListBox = new ListBox();
             isAudioDetectedLabel = new Label();
             isAudioDetectionConfirmedLabel = new Label();
-            transcriptionListBox = new ListBox();
+            rawTranscriptionListBox = new ListBox();
+            transcriptionEnabledCheckBox = new CheckBox();
+            label2 = new Label();
+            label3 = new Label();
+            interpretedTranscriptionListBox = new ListBox();
             SuspendLayout();
             // 
             // label1
@@ -73,21 +77,62 @@
             isAudioDetectionConfirmedLabel.TabIndex = 3;
             isAudioDetectionConfirmedLabel.Text = "Is Audio Detected?";
             // 
-            // transcriptionListBox
+            // rawTranscriptionListBox
             // 
-            transcriptionListBox.FormattingEnabled = true;
-            transcriptionListBox.ItemHeight = 15;
-            transcriptionListBox.Location = new Point(53, 290);
-            transcriptionListBox.Name = "transcriptionListBox";
-            transcriptionListBox.Size = new Size(404, 244);
-            transcriptionListBox.TabIndex = 4;
+            rawTranscriptionListBox.FormattingEnabled = true;
+            rawTranscriptionListBox.ItemHeight = 15;
+            rawTranscriptionListBox.Location = new Point(53, 330);
+            rawTranscriptionListBox.Name = "rawTranscriptionListBox";
+            rawTranscriptionListBox.Size = new Size(404, 229);
+            rawTranscriptionListBox.TabIndex = 4;
+            // 
+            // transcriptionEnabledCheckBox
+            // 
+            transcriptionEnabledCheckBox.AutoSize = true;
+            transcriptionEnabledCheckBox.Location = new Point(53, 256);
+            transcriptionEnabledCheckBox.Name = "transcriptionEnabledCheckBox";
+            transcriptionEnabledCheckBox.Size = new Size(140, 19);
+            transcriptionEnabledCheckBox.TabIndex = 5;
+            transcriptionEnabledCheckBox.Text = "transcriptionEnabled?";
+            transcriptionEnabledCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(196, 299);
+            label2.Name = "label2";
+            label2.Size = new Size(100, 15);
+            label2.TabIndex = 6;
+            label2.Text = "Raw Transcription";
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new Point(670, 299);
+            label3.Name = "label3";
+            label3.Size = new Size(136, 15);
+            label3.TabIndex = 8;
+            label3.Text = "Interpreted Transcription";
+            // 
+            // interpretedTranscriptionListBox
+            // 
+            interpretedTranscriptionListBox.FormattingEnabled = true;
+            interpretedTranscriptionListBox.ItemHeight = 15;
+            interpretedTranscriptionListBox.Location = new Point(527, 330);
+            interpretedTranscriptionListBox.Name = "interpretedTranscriptionListBox";
+            interpretedTranscriptionListBox.Size = new Size(404, 229);
+            interpretedTranscriptionListBox.TabIndex = 7;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1067, 571);
-            Controls.Add(transcriptionListBox);
+            Controls.Add(label3);
+            Controls.Add(interpretedTranscriptionListBox);
+            Controls.Add(label2);
+            Controls.Add(transcriptionEnabledCheckBox);
+            Controls.Add(rawTranscriptionListBox);
             Controls.Add(isAudioDetectionConfirmedLabel);
             Controls.Add(isAudioDetectedLabel);
             Controls.Add(microphoneListBox);
@@ -105,6 +150,10 @@
         private ListBox microphoneListBox;
         private Label isAudioDetectedLabel;
         private Label isAudioDetectionConfirmedLabel;
-        private ListBox transcriptionListBox;
+        private ListBox rawTranscriptionListBox;
+        private CheckBox transcriptionEnabledCheckBox;
+        private Label label2;
+        private Label label3;
+        private ListBox interpretedTranscriptionListBox;
     }
 }

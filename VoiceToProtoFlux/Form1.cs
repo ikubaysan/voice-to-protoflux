@@ -2,6 +2,8 @@ using NAudio.Wave; // Include NAudio for audio handling
 using System;
 using System.Drawing; // For changing label colors
 using System.Windows.Forms;
+using System.Linq;
+
 
 namespace VoiceToProtoFlux
 {
@@ -9,6 +11,7 @@ namespace VoiceToProtoFlux
     {
         private WaveInEvent? waveSource = null;
         private bool audioDetected = false;
+        private SpeechTranscriber? speechTranscriber = null;
 
         public Form1()
         {
@@ -108,16 +111,31 @@ namespace VoiceToProtoFlux
 
             if (detected)
             {
-                isAudioDetectedLabel.Text = $"Audio is currently detected";
+                isAudioDetectedLabel.Text = "Audio is currently detected";
                 isAudioDetectedLabel.ForeColor = Color.Green;
                 isAudioDetectionConfirmedLabel.Text = $"Audio detection confirmed for {micName}.";
                 isAudioDetectionConfirmedLabel.ForeColor = Color.Green;
+
+                // Initialize the speech transcriber once if not already started
+                if (speechTranscriber == null)
+                {
+                    speechTranscriber = new SpeechTranscriber(rawTranscriptionListBox, transcriptionEnabledCheckBox);
+                    speechTranscriber.StartRecognition();
+                }
             }
             else
             {
-                isAudioDetectedLabel.Text = $"Audio not currently detected";
+                isAudioDetectedLabel.Text = "Audio not currently detected";
                 isAudioDetectedLabel.ForeColor = Color.Red;
+
+                // Consider whether you want to stop recognition here or not.
+                // If you stop and dispose of the recognizer, you'll need to create a new instance when audio is detected again.
+                // This example does not stop the SpeechTranscriber instance but you could manage its lifecycle according to your needs.
             }
         }
+
+
+
+
     }
 }
