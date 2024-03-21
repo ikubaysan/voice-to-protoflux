@@ -12,7 +12,7 @@ namespace VoiceToProtoFlux
         private readonly List<TranscriptionCollection> transcriptionHistory = new List<TranscriptionCollection>();
         private readonly ListBox transcriptionListBox;
         private readonly CheckBox transcriptionEnabledCheckBox;
-        private readonly int MaxAlternatesCount = 5; // Specify the number of alternates to consider
+        private readonly int MaxAlternatesCount = 5; // Max number of alternates to consider
         private readonly List<ProtoFluxTypeInfo> protoFluxTypes;
         private readonly WebSocketServer webSocketServer;
 
@@ -26,7 +26,7 @@ namespace VoiceToProtoFlux
             recognizer = new SpeechRecognitionEngine(new System.Globalization.CultureInfo("en-US"));
             recognizer.LoadGrammar(ConstructCustomGrammar());
 
-            recognizer.MaxAlternates = MaxAlternatesCount; // Set the maximum number of alternates
+            recognizer.MaxAlternates = MaxAlternatesCount;
 
             recognizer.EndSilenceTimeout = TimeSpan.FromSeconds(2);
             recognizer.EndSilenceTimeoutAmbiguous = TimeSpan.FromSeconds(2);
@@ -80,7 +80,7 @@ namespace VoiceToProtoFlux
             else
             {
                 transcriptionHistory.Add(transcriptionCollection);
-                // Limit the history size for demonstration
+                // Limit the history size for display
                 if (transcriptionHistory.Count > 10)
                 {
                     transcriptionHistory.RemoveAt(0);
