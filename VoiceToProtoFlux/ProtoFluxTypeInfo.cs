@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace VoiceToProtoFlux
 {
@@ -12,15 +9,17 @@ namespace VoiceToProtoFlux
         public string NiceName { get; set; }
         public string FullCategory { get; set; }
         public string NiceCategory { get; set; }
+        public int ParameterCount { get; set; }
+        public List<string> WordsOfNiceName { get; set; }
 
-        // Constructor
-        // TODO: also determine individual words.
-        public ProtoFluxTypeInfo(string fullName, string niceName, string fullCategory, string niceCategory)
+        public ProtoFluxTypeInfo(string fullName, string niceName, string fullCategory, string niceCategory, int parameterCount, List<string> wordsOfNiceName)
         {
             FullName = fullName;
             NiceName = niceName;
             FullCategory = fullCategory;
             NiceCategory = niceCategory;
+            ParameterCount = parameterCount;
+            WordsOfNiceName = wordsOfNiceName;
         }
     }
 }

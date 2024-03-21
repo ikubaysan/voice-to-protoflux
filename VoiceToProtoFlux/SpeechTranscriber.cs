@@ -15,12 +15,13 @@ namespace VoiceToProtoFlux
         private readonly int MaxAlternatesCount = 5; // Max number of alternates to consider
         private readonly List<ProtoFluxTypeInfo> protoFluxTypes;
         private readonly WebSocketServer webSocketServer;
+        private readonly ProtoFluxTypeInfoCollection protoFluxTypeCollection;
 
-        public SpeechTranscriber(ListBox listBox, CheckBox checkBox, List<ProtoFluxTypeInfo> protoFluxTypes, WebSocketServer webSocketServer)
+        public SpeechTranscriber(ListBox listBox, CheckBox checkBox, ProtoFluxTypeInfoCollection protoFluxTypeCollection, WebSocketServer webSocketServer)
         {
             this.transcriptionListBox = listBox;
             this.transcriptionEnabledCheckBox = checkBox;
-            this.protoFluxTypes = protoFluxTypes;
+            this.protoFluxTypeCollection = protoFluxTypeCollection;
             this.webSocketServer = webSocketServer;
 
             recognizer = new SpeechRecognitionEngine(new System.Globalization.CultureInfo("en-US"));
@@ -37,7 +38,7 @@ namespace VoiceToProtoFlux
 
         private Grammar ConstructCustomGrammar()
         {
-            var phrases = protoFluxTypes.ConvertAll(typeInfo => typeInfo.NiceName);
+            var phrases = protoFluxTypeCollection.typeInfos.ConvertAll(typeInfo => typeInfo.NiceName);
             var choices = new Choices(phrases.ToArray());
             var gb = new GrammarBuilder(choices);
             return new Grammar(gb);

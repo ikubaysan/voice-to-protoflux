@@ -16,6 +16,7 @@ namespace VoiceToProtoFlux
             using (StreamReader reader = new StreamReader(stream))
             {
                 string json = reader.ReadToEnd();
+                // Deserialize into List<ProtoFluxTypeInfo>, assuming JSON structure matches the class structure
                 List<ProtoFluxTypeInfo> types = JsonSerializer.Deserialize<List<ProtoFluxTypeInfo>>(json);
                 return types ?? new List<ProtoFluxTypeInfo>(); // Ensure a non-null list is returned
             }

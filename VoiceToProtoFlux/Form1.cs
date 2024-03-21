@@ -39,14 +39,17 @@ namespace VoiceToProtoFlux
 
             // Update default microphone name label
             defaultMicrophoneNameLabel.Text = $"Your default mic: {defaultMicrophoneName}";
-            List<ProtoFluxTypeInfo> protoFluxTypes = ProtoFluxTypeLoader.LoadProtoFluxTypes();
 
-            // Pass the loaded ProtoFlux types to the SpeechTranscriber
-            if (speechTranscriber == null)
+            List<ProtoFluxTypeInfo> protoFluxTypes = ProtoFluxTypeLoader.LoadProtoFluxTypes();
+            ProtoFluxTypeInfoCollection typeInfoCollection = new ProtoFluxTypeInfoCollection();
+            foreach (var typeInfo in protoFluxTypes)
             {
-                speechTranscriber = new SpeechTranscriber(rawTranscriptionListBox, transcriptionEnabledCheckBox, protoFluxTypes, webSocketServer);
-                speechTranscriber.StartRecognition();
+                typeInfoCollection.AddTypeInfo(typeInfo);
             }
+
+            speechTranscriber = new SpeechTranscriber(rawTranscriptionListBox, transcriptionEnabledCheckBox, typeInfoCollection, webSocketServer);
+            speechTranscriber.StartRecognition();
+            
 
             return;
         }
