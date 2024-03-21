@@ -38,10 +38,25 @@ namespace VoiceToProtoFlux
 
         private Grammar ConstructCustomGrammar()
         {
-            var phrases = protoFluxTypeCollection.typeInfos.ConvertAll(typeInfo => typeInfo.NiceNamePhrase);
-            var choices = new Choices(phrases.ToArray());
-            var gb = new GrammarBuilder(choices);
-            return new Grammar(gb);
+            // Initialize a Choices object to accumulate all phrases from each ProtoFluxTypeInfo
+            var choices = new Choices();
+
+            // Iterate through each ProtoFluxTypeInfo to add its phrases to the Choices
+            foreach (var typeInfo in protoFluxTypeCollection.typeInfos)
+            {
+                foreach (var phrase in typeInfo.Phrases)
+                {
+                    // Adding each phrase as an individual choice
+                    choices.Add(phrase);
+                }
+            }
+
+            // Construct the GrammarBuilder with the accumulated Choices
+            var grammarBuilder = new GrammarBuilder();
+            grammarBuilder.Append(choices);
+
+            // Create the Grammar from the GrammarBuilder
+            return new Grammar(grammarBuilder);
         }
 
         public void StartRecognition()
