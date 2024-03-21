@@ -11,6 +11,7 @@ namespace VoiceToProtoFlux
         public string NiceCategory { get; set; }
         public int ParameterCount { get; set; }
         public List<string> WordsOfNiceName { get; set; }
+        public string NiceNamePhrase { get; set; }
 
         public ProtoFluxTypeInfo(string fullName, string niceName, string fullCategory, string niceCategory, int parameterCount, List<string> wordsOfNiceName)
         {
@@ -20,6 +21,8 @@ namespace VoiceToProtoFlux
             NiceCategory = niceCategory;
             ParameterCount = parameterCount;
             WordsOfNiceName = wordsOfNiceName;
+            // NiceNamePhrase is a concatenation of WordsOfNiceName, separated by spaces
+            NiceNamePhrase = string.Join("", WordsOfNiceName);
         }
     }
 }

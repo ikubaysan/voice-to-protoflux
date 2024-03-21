@@ -38,7 +38,7 @@ namespace VoiceToProtoFlux
 
         private Grammar ConstructCustomGrammar()
         {
-            var phrases = protoFluxTypeCollection.typeInfos.ConvertAll(typeInfo => typeInfo.NiceName);
+            var phrases = protoFluxTypeCollection.typeInfos.ConvertAll(typeInfo => typeInfo.NiceNamePhrase);
             var choices = new Choices(phrases.ToArray());
             var gb = new GrammarBuilder(choices);
             return new Grammar(gb);
