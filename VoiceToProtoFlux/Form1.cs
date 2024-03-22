@@ -21,8 +21,8 @@ namespace VoiceToProtoFlux
         {
             InitializeComponent();
             IdentifyDefaultMicrophone();
-            webSocketServer = new WebSocketServer("http://localhost:7159/"); // Connect with ws://localhost:7159/
-            Task.Run(() => webSocketServer.StartAsync()); // Start the WebSocket server asynchronously
+            webSocketServer = new WebSocketServer("http://localhost:7159/");
+            Task.Run(() => webSocketServer.StartAsync());
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -45,7 +45,14 @@ namespace VoiceToProtoFlux
             ProtoFluxTypeInfoCollection typeInfoCollection = ProtoFluxTypeLoader.LoadProtoFluxTypes();
 
             speechTranscriber = new SpeechTranscriber(rawTranscriptionListBox, typeInfoCollection, webSocketServer);
+            speechTranscriber.AudioLevelUpdated += SpeechTranscriber_AudioLevelUpdated; // Subscribe to the new event
+
             return;
+        }
+
+        private void SpeechTranscriber_AudioLevelUpdated(object sender, int audioLevel)
+        {
+            UpdateAudioDetectionLabel(audioLevel > 0);
         }
 
         private void IdentifyDefaultMicrophone()
@@ -64,53 +71,6 @@ namespace VoiceToProtoFlux
             // No longer start listening here, SpeechRecognitionEngine will handle it
             // Update default microphone name label
             defaultMicrophoneNameLabel.Text = $"Your default mic: {defaultMicrophoneName}";
-        }
-
-
-        private void StartListeningToMicrophone(int deviceNumber)
-        {
-            StopListening(); // Stop previous listening
-
-            waveSource = new WaveInEvent();
-            waveSource.DeviceNumber = deviceNumber;
-            waveSource.WaveFormat = new WaveFormat(44100, 1); // CD quality audio in mono
-
-            waveSource.DataAvailable += OnDataAvailable;
-            waveSource.StartRecording();
-        }
-
-        private void StopListening()
-        {
-            if (waveSource != null)
-            {
-                waveSource.StopRecording();
-                waveSource.DataAvailable -= OnDataAvailable;
-                waveSource.Dispose();
-                waveSource = null;
-            }
-        }
-
-        private void OnDataAvailable(object? sender, WaveInEventArgs e)
-        {
-            for (int index = 0; index < e.BytesRecorded; index += 2)
-            {
-                short sample = (short)((e.Buffer[index + 1] << 8) | e.Buffer[index]);
-                if (sample > 500)
-                {
-                    if (!audioDetected)
-                    {
-                        audioDetected = true;
-                        UpdateAudioDetectionLabel(true);
-                    }
-                    return;
-                }
-            }
-
-            if (audioDetected)
-            {
-                audioDetected = false;
-                UpdateAudioDetectionLabel(false);
-            }
         }
 
         private void UpdateAudioDetectionLabel(bool detected)
