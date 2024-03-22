@@ -9,15 +9,10 @@ namespace VoiceToProtoFlux.Objects.TranscriptionObjects
     public class TranscriptionCollection
     {
         public List<Transcription> transcriptions = new List<Transcription>();
-        public int MaxAlternatesCount { get; set; } = 5; // Default to 5, can be adjusted
 
-        public void AddTranscription(string text, float confidence)
+        public void AddTranscription(Transcription transcription)
         {
-            if (transcriptions.Count >= MaxAlternatesCount)
-            {
-                transcriptions.RemoveAt(0); // Ensure we do not exceed MaxAlternatesCount
-            }
-            transcriptions.Add(new Transcription(text, confidence));
+            transcriptions.Add(transcription);
         }
 
         public override string ToString()

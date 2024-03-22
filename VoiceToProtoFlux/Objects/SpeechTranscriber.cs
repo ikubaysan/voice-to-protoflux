@@ -13,16 +13,14 @@ namespace VoiceToProtoFlux.Objects
         private readonly SpeechRecognitionEngine recognizer;
         private readonly List<TranscriptionCollection> transcriptionHistory = new List<TranscriptionCollection>();
         private readonly ListBox transcriptionListBox;
-        private readonly CheckBox transcriptionEnabledCheckBox;
         private readonly int MaxAlternatesCount = 5; // Max number of alternates to consider
         private readonly List<ProtoFluxTypeInfo> protoFluxTypes;
         private readonly WebSocketServer webSocketServer;
         private readonly ProtoFluxTypeInfoCollection protoFluxTypeCollection;
 
-        public SpeechTranscriber(ListBox listBox, CheckBox checkBox, ProtoFluxTypeInfoCollection protoFluxTypeCollection, WebSocketServer webSocketServer)
+        public SpeechTranscriber(ListBox listBox, ProtoFluxTypeInfoCollection protoFluxTypeCollection, WebSocketServer webSocketServer)
         {
             transcriptionListBox = listBox;
-            transcriptionEnabledCheckBox = checkBox;
             this.protoFluxTypeCollection = protoFluxTypeCollection;
             this.webSocketServer = webSocketServer;
 
@@ -71,24 +69,37 @@ namespace VoiceToProtoFlux.Objects
             recognizer.RecognizeAsyncStop();
         }
 
-        private void Recognizer_SpeechRecognized(object? sender, SpeechRecognizedEventArgs e)
+        private async void Recognizer_SpeechRecognized(object? sender, SpeechRecognizedEventArgs e)
         {
-            if (!transcriptionEnabledCheckBox.Checked) return;
-
             // Create a new TranscriptionsCollection for the current recognition event
             var transcriptionCollection = new TranscriptionCollection();
 
+            ProtoFluxTypeInfo? matchedProtoFluxTypeInfo = null;
+
             foreach (var alternate in e.Result.Alternates)
             {
-                // Add each transcription alternative to the TranscriptionsCollection
-                transcriptionCollection.AddTranscription(alternate.Text, alternate.Confidence);
+
+                matchedProtoFluxTypeInfo = protoFluxTypeCollection.GetTypeInfoByPhrase(alternate.Text);
+                if (matchedProtoFluxTypeInfo != null) break;
             }
+
+            if (matchedProtoFluxTypeInfo == null) return;
+
+            Transcription transcription = new Transcription(fullName: matchedProtoFluxTypeInfo.FullName, 
+                niceName: matchedProtoFluxTypeInfo.NiceName, 
+                parameterCount: matchedProtoFluxTypeInfo.ParameterCount, 
+                confidence: e.Result.Confidence);
+
+            // Add each transcription alternative to the TranscriptionsCollection
+            transcriptionCollection.AddTranscription(transcription);
+
+            await webSocketServer.BroadcastMessageAsync(transcription.ToWebsocketString());
 
             // Add the TranscriptionsCollection to the history
             DisplayTranscriptionCollection(transcriptionCollection);
         }
 
-        private async void DisplayTranscriptionCollection(TranscriptionCollection transcriptionCollection)
+        private void DisplayTranscriptionCollection(TranscriptionCollection transcriptionCollection)
         {
             // Adjusted to handle TranscriptionsCollection
             if (transcriptionListBox.InvokeRequired)
@@ -113,15 +124,10 @@ namespace VoiceToProtoFlux.Objects
 
 
             StringBuilder messageBuilder = new StringBuilder();
-            foreach (var transcription in transcriptionCollection.transcriptions)
+            foreach (Transcription transcription in transcriptionCollection.transcriptions)
             {
-                messageBuilder.Append($"{transcription.Text};{transcription.Confidence}|");
+                messageBuilder.Append($"{transcription.ToWebsocketString()}");
             }
-
-            string message = messageBuilder.ToString().TrimEnd('|');
-            await webSocketServer.BroadcastMessageAsync(message);
-
-
         }
     }
 

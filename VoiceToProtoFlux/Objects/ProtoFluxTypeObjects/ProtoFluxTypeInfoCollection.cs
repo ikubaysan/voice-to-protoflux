@@ -20,7 +20,7 @@ namespace VoiceToProtoFlux.Objects.ProtoFluxTypeObjects
             }
         }
 
-        public ProtoFluxTypeInfo GetTypeInfoByPhrase(string phrase)
+        public ProtoFluxTypeInfo? GetTypeInfoByPhrase(string phrase)
         {
             phraseMap.TryGetValue(phrase, out ProtoFluxTypeInfo typeInfo);
             return typeInfo;

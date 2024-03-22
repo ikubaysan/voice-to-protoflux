@@ -8,18 +8,30 @@ namespace VoiceToProtoFlux.Objects.TranscriptionObjects
 {
     public class Transcription
     {
-        public string Text { get; set; }
+        public string FullName { get; set; }
+        public string NiceName { get; set; }
+        public int ParameterCount { get; set; }
         public float Confidence { get; set; }
 
-        public Transcription(string text, float confidence)
+
+        public Transcription(string fullName, string niceName, int parameterCount, float confidence)
         {
-            Text = text;
+            FullName = fullName;
+            NiceName = niceName;
+            ParameterCount = parameterCount;
             Confidence = confidence;
+        }
+
+        public string ToWebsocketString()
+        {
+            string buttonRelayArgument = "";
+            buttonRelayArgument += FullName;
+            return $"{ParameterCount}|{buttonRelayArgument}|{NiceName}";
         }
 
         public override string ToString()
         {
-            return $"{Text} (Confidence: {Confidence:N2})";
+            return $"{FullName} (Confidence: {Confidence:N2})";
         }
     }
 }

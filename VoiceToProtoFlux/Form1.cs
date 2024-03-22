@@ -12,7 +12,7 @@ namespace VoiceToProtoFlux
     {
         private WaveInEvent? waveSource = null;
         private bool audioDetected = false;
-        private SpeechTranscriber? speechTranscriber = null;
+        private SpeechTranscriber speechTranscriber;
         private string defaultMicrophoneName = "Unknown Microphone";
         private List<ProtoFluxTypeInfo> protoFluxTypes;
         private WebSocketServer webSocketServer;
@@ -44,9 +44,7 @@ namespace VoiceToProtoFlux
 
             ProtoFluxTypeInfoCollection typeInfoCollection = ProtoFluxTypeLoader.LoadProtoFluxTypes();
 
-            speechTranscriber = new SpeechTranscriber(rawTranscriptionListBox, transcriptionEnabledCheckBox, typeInfoCollection, webSocketServer);
-            speechTranscriber.StartRecognition();
-
+            speechTranscriber = new SpeechTranscriber(rawTranscriptionListBox, typeInfoCollection, webSocketServer);
             return;
         }
 
@@ -132,6 +130,18 @@ namespace VoiceToProtoFlux
             {
                 isAudioDetectedLabel.Text = "Audio not currently detected";
                 isAudioDetectedLabel.ForeColor = Color.Red;
+            }
+        }
+
+        private void transcriptionEnabledCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (transcriptionEnabledCheckBox.Checked)
+            {
+                speechTranscriber.StartRecognition();
+            }
+            else
+            {
+                speechTranscriber.StopRecognition();
             }
         }
     }

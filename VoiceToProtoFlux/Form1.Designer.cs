@@ -83,6 +83,7 @@
             transcriptionEnabledCheckBox.TabIndex = 5;
             transcriptionEnabledCheckBox.Text = "transcriptionEnabled?";
             transcriptionEnabledCheckBox.UseVisualStyleBackColor = true;
+            transcriptionEnabledCheckBox.CheckedChanged += transcriptionEnabledCheckBox_CheckedChanged;
             // 
             // label2
             // 
