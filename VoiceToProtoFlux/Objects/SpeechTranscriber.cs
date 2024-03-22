@@ -17,6 +17,7 @@ namespace VoiceToProtoFlux.Objects
         private readonly WebSocketServer webSocketServer;
         private readonly ProtoFluxTypeInfoCollection protoFluxTypeCollection;
         public event EventHandler<AudioLevelUpdatedEventArgs>? AudioLevelUpdated;
+        public bool recognitionActive = false;
 
         public SpeechTranscriber(ListBox listBox, ProtoFluxTypeInfoCollection protoFluxTypeCollection, WebSocketServer webSocketServer)
         {
@@ -67,12 +68,16 @@ namespace VoiceToProtoFlux.Objects
 
         public void StartRecognition()
         {
+            if (recognitionActive) return;
             recognizer.RecognizeAsync(RecognizeMode.Multiple);
+            recognitionActive = true;
         }
 
         public void StopRecognition()
         {
+            if (!recognitionActive) return;
             recognizer.RecognizeAsyncStop();
+            recognitionActive = false;
         }
 
         private async void Recognizer_SpeechRecognized(object? sender, SpeechRecognizedEventArgs e)

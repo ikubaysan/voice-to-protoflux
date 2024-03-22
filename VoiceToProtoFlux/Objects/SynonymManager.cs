@@ -25,7 +25,7 @@ namespace VoiceToProtoFlux.Objects
             synonyms.Add("minutes", new List<string> { "Mins" });
             synonyms.Add("concatenate", new List<string> { "Concat" });
             synonyms.Add("approximately", new List<string> { "Approx" });
-
+            synonyms.Add("dynamic", new List<string> { "Dy" });
         }
 
         public IEnumerable<string> GetSynonyms(string word)
