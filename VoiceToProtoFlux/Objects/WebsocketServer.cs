@@ -24,7 +24,7 @@ namespace VoiceToProtoFlux.Objects
         {
             isListening = true;
             httpListener.Start();
-            Console.WriteLine($"WebSocketServer started at {httpListener.Prefixes.FirstOrDefault()}");
+            System.Diagnostics.Debug.WriteLine($"WebSocketServer started at {httpListener.Prefixes.FirstOrDefault()}");
 
             while (isListening)
             {

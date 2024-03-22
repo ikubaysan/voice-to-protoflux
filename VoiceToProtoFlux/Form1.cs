@@ -61,9 +61,11 @@ namespace VoiceToProtoFlux
             var defaultMic = WaveIn.GetCapabilities(0);
             defaultMicrophoneName = defaultMic.ProductName;
 
-            // Automatically start listening to the default microphone
-            StartListeningToMicrophone(0);
+            // No longer start listening here, SpeechRecognitionEngine will handle it
+            // Update default microphone name label
+            defaultMicrophoneNameLabel.Text = $"Your default mic: {defaultMicrophoneName}";
         }
+
 
         private void StartListeningToMicrophone(int deviceNumber)
         {
@@ -123,6 +125,7 @@ namespace VoiceToProtoFlux
             {
                 isAudioDetectedLabel.Text = "Audio is currently detected";
                 isAudioDetectedLabel.ForeColor = Color.Green;
+                // As soon as we detect any audio, we can confirm that the audio detection is working
                 isAudioDetectionConfirmedLabel.Text = $"Audio detection confirmed for {defaultMicrophoneName}.";
                 isAudioDetectionConfirmedLabel.ForeColor = Color.Green;
             }

@@ -34,6 +34,32 @@ namespace VoiceToProtoFlux.Objects
 
             recognizer.SpeechRecognized += Recognizer_SpeechRecognized;
             recognizer.SetInputToDefaultAudioDevice();
+
+            recognizer.AudioLevelUpdated += Recognizer_AudioLevelUpdated;
+            recognizer.SpeechDetected += Recognizer_SpeechDetected;
+            recognizer.RecognizeCompleted += Recognizer_RecognizeCompleted;
+            recognizer.SpeechRecognitionRejected += Recognizer_SpeechRecognitionRejected;
+            System.Diagnostics.Debug.WriteLine("SpeechTranscriber initialized.");
+        }
+
+        private void Recognizer_AudioLevelUpdated(object sender, AudioLevelUpdatedEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine($"Audio level updated: {e.AudioLevel}");
+        }
+
+        private void Recognizer_SpeechDetected(object sender, SpeechDetectedEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine("Speech detected.");
+        }
+
+        private void Recognizer_RecognizeCompleted(object sender, RecognizeCompletedEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine("Recognition attempt completed.");
+        }
+
+        private void Recognizer_SpeechRecognitionRejected(object sender, SpeechRecognitionRejectedEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine("Speech recognized but not matched to any grammar.");
         }
 
         private Grammar ConstructCustomGrammar()
