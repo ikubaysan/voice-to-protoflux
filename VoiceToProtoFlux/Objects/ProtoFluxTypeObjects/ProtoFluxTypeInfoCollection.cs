@@ -10,6 +10,12 @@ namespace VoiceToProtoFlux.Objects.ProtoFluxTypeObjects
 
         public void AddTypeInfo(ProtoFluxTypeInfo typeInfo)
         {
+
+            if (typeInfo.ParameterCount > 1)
+            {
+                return; // TODO: Currently don't support multiple parameters
+            }
+
             typeInfos.Add(typeInfo);
             foreach (var phrase in typeInfo.Phrases)
             {
