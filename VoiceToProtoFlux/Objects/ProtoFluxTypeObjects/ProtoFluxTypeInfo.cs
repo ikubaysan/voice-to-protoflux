@@ -30,15 +30,14 @@ namespace VoiceToProtoFlux.Objects.ProtoFluxTypeObjects
 
         private void GenerateAdditionalPhrases()
         {
-            SynonymManager synonymManager = new SynonymManager(); // Consider making this a shared instance
             var baseWords = WordsOfNiceName;
 
             // Iterate over each word to find synonyms and generate phrases
             foreach (var word in baseWords)
             {
-                if (synonymManager.HasSynonyms(word))
+                if (SynonymManager.HasSynonyms(word))
                 {
-                    foreach (var synonym in synonymManager.GetSynonyms(word))
+                    foreach (var synonym in SynonymManager.GetSynonyms(word))
                     {
                         var newPhrase = new List<string>(baseWords);
                         newPhrase[newPhrase.IndexOf(word)] = synonym; // Replace word with its synonym

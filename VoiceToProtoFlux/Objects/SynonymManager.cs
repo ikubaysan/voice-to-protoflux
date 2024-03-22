@@ -1,44 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace VoiceToProtoFlux.Objects
 {
-    public class SynonymManager
+    public static class SynonymManager
     {
-        private readonly Dictionary<string, List<string>> synonyms = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
-
-        public SynonymManager()
+        // Static field initialized directly.
+        private static readonly Dictionary<string, List<string>> synonyms = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase)
         {
-            // Initialize synonyms. Ensure to use lowercase for keys for case-insensitive matching.
-            synonyms.Add("ulong", new List<string> { "UnsignedLong" });
-            synonyms.Add("ushort", new List<string> { "UnsignedShort" });
-            synonyms.Add("u", new List<string> { "Unsigned" });
-            synonyms.Add("char", new List<string> { "Character" });
-            synonyms.Add("uint", new List<string> { "UnsignedInt", "UnsignedInteger" });
-            synonyms.Add("int", new List<string> { "Integer" });
-            synonyms.Add("ref", new List<string> { "Reference" });
-            synonyms.Add("add", new List<string> { "Addition" });
-            synonyms.Add("seconds", new List<string> { "Secs" });
-            synonyms.Add("minutes", new List<string> { "Mins" });
-            synonyms.Add("concatenate", new List<string> { "Concat" });
-            synonyms.Add("approximately", new List<string> { "Approx" });
-            synonyms.Add("dynamic", new List<string> { "Dy" });
-        }
+            {"ulong", new List<string> { "UnsignedLong" }},
+            {"ushort", new List<string> { "UnsignedShort" }},
+            {"u", new List<string> { "Unsigned" }},
+            {"char", new List<string> { "Character" }},
+            {"uint", new List<string> { "UnsignedInt", "UnsignedInteger" }},
+            {"int", new List<string> { "Integer" }},
+            {"ref", new List<string> { "Reference" }},
+            {"add", new List<string> { "Addition" }},
+            {"seconds", new List<string> { "Secs" }},
+            {"minutes", new List<string> { "Mins" }},
+            {"concatenate", new List<string> { "Concat" }},
+            {"approximately", new List<string> { "Approx" }},
+            {"dynamic", new List<string> { "Dy" }}
+        };
 
-        public IEnumerable<string> GetSynonyms(string word)
+        // Since we no longer have a constructor, we initialize the dictionary directly above.
+
+        public static IEnumerable<string> GetSynonyms(string word)
         {
             string lowercaseWord = word.ToLower();
             if (synonyms.ContainsKey(lowercaseWord))
             {
-                return synonyms[word];
+                return synonyms[lowercaseWord];
             }
             return new List<string>();
         }
 
-        public bool HasSynonyms(string word) => synonyms.ContainsKey(word);
+        public static bool HasSynonyms(string word)
+        {
+            return synonyms.ContainsKey(word.ToLower());
+        }
     }
-
 }
