@@ -5,16 +5,14 @@ using System.Windows.Forms;
 using System.Linq;
 using VoiceToProtoFlux.Objects.ProtoFluxTypeObjects;
 using VoiceToProtoFlux.Objects;
+using System.Speech.Recognition;
 
 namespace VoiceToProtoFlux
 {
     public partial class Form1 : Form
     {
-        private WaveInEvent? waveSource = null;
-        private bool audioDetected = false;
         private SpeechTranscriber speechTranscriber;
         private string defaultMicrophoneName = "Unknown Microphone";
-        private List<ProtoFluxTypeInfo> protoFluxTypes;
         private WebSocketServer webSocketServer;
 
         public Form1()
@@ -23,6 +21,10 @@ namespace VoiceToProtoFlux
             IdentifyDefaultMicrophone();
             webSocketServer = new WebSocketServer("http://localhost:7159/");
             Task.Run(() => webSocketServer.StartAsync());
+
+            ProtoFluxTypeInfoCollection typeInfoCollection = ProtoFluxTypeLoader.LoadProtoFluxTypes();
+            speechTranscriber = new SpeechTranscriber(rawTranscriptionListBox, typeInfoCollection, webSocketServer);
+            speechTranscriber.AudioLevelUpdated += SpeechTranscriber_AudioLevelUpdated; // Subscribe to the new event
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -39,20 +41,12 @@ namespace VoiceToProtoFlux
             isAudioDetectionConfirmedLabel.Text = "Audio detection not confirmed";
             isAudioDetectionConfirmedLabel.ForeColor = Color.Red;
 
-            // Update default microphone name label
-            defaultMicrophoneNameLabel.Text = $"Your default mic: {defaultMicrophoneName}";
-
-            ProtoFluxTypeInfoCollection typeInfoCollection = ProtoFluxTypeLoader.LoadProtoFluxTypes();
-
-            speechTranscriber = new SpeechTranscriber(rawTranscriptionListBox, typeInfoCollection, webSocketServer);
-            speechTranscriber.AudioLevelUpdated += SpeechTranscriber_AudioLevelUpdated; // Subscribe to the new event
-
             return;
         }
 
-        private void SpeechTranscriber_AudioLevelUpdated(object sender, int audioLevel)
+        private void SpeechTranscriber_AudioLevelUpdated(object? sender, AudioLevelUpdatedEventArgs e)
         {
-            UpdateAudioDetectionLabel(audioLevel > 0);
+            UpdateAudioDetectionLabel(e.AudioLevel > 0);
         }
 
         private void IdentifyDefaultMicrophone()

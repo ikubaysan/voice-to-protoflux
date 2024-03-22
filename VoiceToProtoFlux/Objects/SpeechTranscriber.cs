@@ -14,10 +14,9 @@ namespace VoiceToProtoFlux.Objects
         private readonly List<TranscriptionCollection> transcriptionHistory = new List<TranscriptionCollection>();
         private readonly ListBox transcriptionListBox;
         private readonly int MaxAlternatesCount = 5; // Max number of alternates to consider
-        private readonly List<ProtoFluxTypeInfo> protoFluxTypes;
         private readonly WebSocketServer webSocketServer;
         private readonly ProtoFluxTypeInfoCollection protoFluxTypeCollection;
-        public event EventHandler<int> AudioLevelUpdated;
+        public event EventHandler<AudioLevelUpdatedEventArgs>? AudioLevelUpdated;
 
         public SpeechTranscriber(ListBox listBox, ProtoFluxTypeInfoCollection protoFluxTypeCollection, WebSocketServer webSocketServer)
         {
@@ -137,10 +136,10 @@ namespace VoiceToProtoFlux.Objects
             }
         }
 
-        private void Recognizer_AudioLevelUpdated(object sender, AudioLevelUpdatedEventArgs e)
+        private void Recognizer_AudioLevelUpdated(object? sender, AudioLevelUpdatedEventArgs e)
         {
             // System.Diagnostics.Debug.WriteLine($"Audio level updated: {e.AudioLevel}");
-            AudioLevelUpdated?.Invoke(this, e.AudioLevel);
+            AudioLevelUpdated?.Invoke(this, e);
         }
 
         private void Recognizer_SpeechDetected(object sender, SpeechDetectedEventArgs e)
