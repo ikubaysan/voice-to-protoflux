@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Speech.Recognition;
 using System.Text;
 using System.Windows.Forms;
+using VoiceToProtoFlux.Objects.ProtoFluxTypeObjects;
+using VoiceToProtoFlux.Objects.TranscriptionObjects;
 
-namespace VoiceToProtoFlux
+namespace VoiceToProtoFlux.Objects
 {
     public class SpeechTranscriber
     {
@@ -19,8 +21,8 @@ namespace VoiceToProtoFlux
 
         public SpeechTranscriber(ListBox listBox, CheckBox checkBox, ProtoFluxTypeInfoCollection protoFluxTypeCollection, WebSocketServer webSocketServer)
         {
-            this.transcriptionListBox = listBox;
-            this.transcriptionEnabledCheckBox = checkBox;
+            transcriptionListBox = listBox;
+            transcriptionEnabledCheckBox = checkBox;
             this.protoFluxTypeCollection = protoFluxTypeCollection;
             this.webSocketServer = webSocketServer;
 

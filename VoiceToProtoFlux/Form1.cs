@@ -3,6 +3,8 @@ using System;
 using System.Drawing; // For changing label colors
 using System.Windows.Forms;
 using System.Linq;
+using VoiceToProtoFlux.Objects.ProtoFluxTypeObjects;
+using VoiceToProtoFlux.Objects;
 
 namespace VoiceToProtoFlux
 {
@@ -40,16 +42,10 @@ namespace VoiceToProtoFlux
             // Update default microphone name label
             defaultMicrophoneNameLabel.Text = $"Your default mic: {defaultMicrophoneName}";
 
-            List<ProtoFluxTypeInfo> protoFluxTypes = ProtoFluxTypeLoader.LoadProtoFluxTypes();
-            ProtoFluxTypeInfoCollection typeInfoCollection = new ProtoFluxTypeInfoCollection();
-            foreach (var typeInfo in protoFluxTypes)
-            {
-                typeInfoCollection.AddTypeInfo(typeInfo);
-            }
+            ProtoFluxTypeInfoCollection typeInfoCollection = ProtoFluxTypeLoader.LoadProtoFluxTypes();
 
             speechTranscriber = new SpeechTranscriber(rawTranscriptionListBox, transcriptionEnabledCheckBox, typeInfoCollection, webSocketServer);
             speechTranscriber.StartRecognition();
-            
 
             return;
         }

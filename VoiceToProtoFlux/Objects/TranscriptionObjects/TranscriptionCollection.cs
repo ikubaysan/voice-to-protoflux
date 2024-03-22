@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace VoiceToProtoFlux
+namespace VoiceToProtoFlux.Objects.TranscriptionObjects
 {
     public class TranscriptionCollection
     {
@@ -22,7 +22,7 @@ namespace VoiceToProtoFlux
 
         public override string ToString()
         {
-            var sb = new System.Text.StringBuilder();
+            var sb = new StringBuilder();
             foreach (var transcription in transcriptions)
             {
                 sb.AppendLine(transcription.ToString());

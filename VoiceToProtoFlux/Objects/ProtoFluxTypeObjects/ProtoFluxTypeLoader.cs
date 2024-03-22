@@ -3,11 +3,11 @@ using System.IO;
 using System.Reflection;
 using System.Text.Json;
 
-namespace VoiceToProtoFlux
+namespace VoiceToProtoFlux.Objects.ProtoFluxTypeObjects
 {
     public static class ProtoFluxTypeLoader
     {
-        public static List<ProtoFluxTypeInfo> LoadProtoFluxTypes()
+        public static ProtoFluxTypeInfoCollection LoadProtoFluxTypes()
         {
             var assembly = Assembly.GetExecutingAssembly();
             var resourceName = "VoiceToProtoFlux.Resources.ProtoFluxTypes.json";
@@ -16,9 +16,18 @@ namespace VoiceToProtoFlux
             using (StreamReader reader = new StreamReader(stream))
             {
                 string json = reader.ReadToEnd();
+
                 // Deserialize into List<ProtoFluxTypeInfo>, assuming JSON structure matches the class structure
                 List<ProtoFluxTypeInfo> types = JsonSerializer.Deserialize<List<ProtoFluxTypeInfo>>(json);
-                return types ?? new List<ProtoFluxTypeInfo>(); // Ensure a non-null list is returned
+
+                ProtoFluxTypeInfoCollection typeInfoCollection = new ProtoFluxTypeInfoCollection();
+
+                foreach (ProtoFluxTypeInfo type in types)
+                {
+                    typeInfoCollection.AddTypeInfo(type);
+                }
+
+                return typeInfoCollection;
             }
         }
     }

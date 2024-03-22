@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Text;
 
-namespace VoiceToProtoFlux
+namespace VoiceToProtoFlux.Objects
 {
     public class WebSocketServer
     {
