@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VoiceToProtoFlux.Objects.ProtoFluxParameterObjects;
 
 namespace VoiceToProtoFlux.Objects.TranscriptionObjects
 {
@@ -11,14 +12,16 @@ namespace VoiceToProtoFlux.Objects.TranscriptionObjects
         public string FullName { get; set; }
         public string NiceName { get; set; }
         public int ParameterCount { get; set; }
+        public List<ProtoFluxParameter> ProvidedParameters { get; set; }
         public float Confidence { get; set; }
 
 
-        public Transcription(string fullName, string niceName, int parameterCount, float confidence)
+        public Transcription(string fullName, string niceName, int parameterCount, List<ProtoFluxParameter> providedParameters, float confidence)
         {
             FullName = fullName;
             NiceName = niceName;
             ParameterCount = parameterCount;
+            ProvidedParameters = providedParameters;
             Confidence = confidence;
         }
 
@@ -26,7 +29,16 @@ namespace VoiceToProtoFlux.Objects.TranscriptionObjects
         {
             string buttonRelayArgument = "";
             buttonRelayArgument += FullName;
-            return $"{ParameterCount}|{buttonRelayArgument}|{NiceName}";
+
+
+            string parameterName = "";
+            if (ProvidedParameters.Count > 0)
+            { 
+                // get the 1st parameter name
+                parameterName = ProvidedParameters[0].Name;
+            }
+
+            return $"{ParameterCount}|{parameterName}|{buttonRelayArgument}|{NiceName}";
         }
 
         public override string ToString()

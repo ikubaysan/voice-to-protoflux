@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Speech.Recognition;
 using System.Text;
 using System.Windows.Forms;
+using VoiceToProtoFlux.Objects.ProtoFluxParameterObjects;
 using VoiceToProtoFlux.Objects.ProtoFluxTypeObjects;
 using VoiceToProtoFlux.Objects.TranscriptionObjects;
 
@@ -86,19 +87,37 @@ namespace VoiceToProtoFlux.Objects
             var transcriptionCollection = new TranscriptionCollection();
 
             ProtoFluxTypeInfo? matchedProtoFluxTypeInfo = null;
+            string transcriptionText = "";
 
             foreach (var alternate in e.Result.Alternates)
             {
 
                 matchedProtoFluxTypeInfo = protoFluxTypeCollection.GetTypeInfoByPhrase(alternate.Text);
+                transcriptionText = alternate.Text.ToLower();
                 if (matchedProtoFluxTypeInfo != null) break;
             }
 
             if (matchedProtoFluxTypeInfo == null) return;
 
+            List<ProtoFluxParameter> providedParameters = new List<ProtoFluxParameter>();
+            if (matchedProtoFluxTypeInfo.ParameterCount > 0)
+            {
+                ProtoFluxParameter? matchedParameter = null;
+                if (transcriptionText.Contains("oftype"))
+                {
+                    // If the transcription contains "of type", the parameter is all the chars after "of type"
+                    string parameterText = transcriptionText.Substring(transcriptionText.IndexOf("oftype") + 6);
+                    matchedParameter = ProtoFluxParameterCollection.Instance.GetParameterByName(parameterText);
+                    if (matchedParameter != null) providedParameters.Add(matchedParameter);
+                }
+                if (matchedParameter == null) providedParameters.Add(ProtoFluxParameterCollection.Instance.GetDefaultParameter());
+            }
+            // If parameterCount is 0, we don't need to provide any parameters
+
             Transcription transcription = new Transcription(fullName: matchedProtoFluxTypeInfo.FullName, 
                 niceName: matchedProtoFluxTypeInfo.NiceName, 
                 parameterCount: matchedProtoFluxTypeInfo.ParameterCount, 
+                providedParameters: providedParameters,
                 confidence: e.Result.Confidence);
 
             // Add each transcription alternative to the TranscriptionsCollection

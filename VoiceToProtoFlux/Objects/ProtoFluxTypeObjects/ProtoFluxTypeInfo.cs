@@ -24,9 +24,34 @@ namespace VoiceToProtoFlux.Objects.ProtoFluxTypeObjects
 
             // We want the phrases to be single compound-words so they'll get picked up by the transcriber.
             Phrases = new List<string> { string.Join("", WordsOfNiceName) };
+            
             // Generate additional phrases using synonyms
             GenerateAdditionalPhrases();
+            if (parameterCount > 0) GenerateParameterBasedPhrases();
         }
+
+        private void GenerateParameterBasedPhrases()
+        {
+            var basePhrase = string.Join("", WordsOfNiceName);
+            foreach (var parameter in ProtoFluxParameterCollection.Instance.Parameters.Values)
+            {
+                foreach (var phrase in parameter.Phrases)
+                {
+                    // If basePhrase ends with OfType, don't add another OfType
+                    // Eg "ClearDynamicVariablesOfType" should not become "ClearDynamicVariablesOfTypeOfTypeInt",
+                    // it should be "ClearDynamicVariablesOfTypeInt"
+                    if (basePhrase.EndsWith("OfType") && phrase.StartsWith("OfType"))
+                    {
+                        Phrases.Add(basePhrase + phrase);
+                    }
+                    else
+                    {
+                        Phrases.Add(basePhrase + "OfType" + phrase);
+                    }
+                }
+            }
+        }
+
 
         private void GenerateAdditionalPhrases()
         {

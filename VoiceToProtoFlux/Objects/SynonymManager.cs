@@ -8,6 +8,8 @@ namespace VoiceToProtoFlux.Objects
         // Static field initialized directly.
         private static readonly Dictionary<string, List<string>> synonyms = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase)
         {
+            // Key: the actual word
+            // Value: list of words you can say which are synonymous
             {"ulong", new List<string> { "UnsignedLong" }},
             {"ushort", new List<string> { "UnsignedShort" }},
             {"u", new List<string> { "Unsigned" }},
@@ -20,7 +22,9 @@ namespace VoiceToProtoFlux.Objects
             {"minutes", new List<string> { "Mins" }},
             {"concatenate", new List<string> { "Concat" }},
             {"approximately", new List<string> { "Approx" }},
-            {"dynamic", new List<string> { "Dy" }}
+            {"dynamic", new List<string> { "Dy", "Dyn" }},
+            {"bool", new List<string> { "Boolean" } },
+            {"reference", new List<string> { "Ref" }}
         };
 
         // Since we no longer have a constructor, we initialize the dictionary directly above.
