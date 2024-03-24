@@ -114,9 +114,8 @@ namespace VoiceToProtoFlux.Objects
             }
             // If parameterCount is 0, we don't need to provide any parameters
 
-            Transcription transcription = new Transcription(fullName: matchedProtoFluxTypeInfo.FullName, 
-                niceName: matchedProtoFluxTypeInfo.NiceName, 
-                parameterCount: matchedProtoFluxTypeInfo.ParameterCount, 
+            Transcription transcription = new Transcription(
+                protoFluxTypeInfo: matchedProtoFluxTypeInfo,
                 providedParameters: providedParameters,
                 confidence: e.Result.Confidence);
 

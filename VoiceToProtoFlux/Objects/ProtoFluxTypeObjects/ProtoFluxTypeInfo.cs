@@ -10,6 +10,7 @@ namespace VoiceToProtoFlux.Objects.ProtoFluxTypeObjects
         public string FullCategory { get; set; }
         public string NiceCategory { get; set; }
         public int ParameterCount { get; set; }
+        public bool RequiresObjectParameter { get; set; }
         public List<string> WordsOfNiceName { get; set; }
         public List<string> Phrases { get; set; }
 
@@ -24,6 +25,9 @@ namespace VoiceToProtoFlux.Objects.ProtoFluxTypeObjects
 
             // We want the phrases to be single compound-words so they'll get picked up by the transcriber.
             Phrases = new List<string> { string.Join("", WordsOfNiceName) };
+
+            // If Phrases contains "Object", then the type requires an object parameter
+            RequiresObjectParameter = Phrases.Contains("Object");
             
             // Generate additional phrases using synonyms
             GenerateAdditionalPhrases();
