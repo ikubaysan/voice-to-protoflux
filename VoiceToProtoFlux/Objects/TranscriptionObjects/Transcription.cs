@@ -10,7 +10,6 @@ namespace VoiceToProtoFlux.Objects.TranscriptionObjects
 {
     public class Transcription
     {
-        public int ParameterCount { get; set; }
         public ProtoFluxTypeInfo ProtoFluxTypeInfo { get; set; }
         public List<ProtoFluxParameter> ProvidedParameters { get; set; }
         public float Confidence { get; set; }
@@ -30,16 +29,23 @@ namespace VoiceToProtoFlux.Objects.TranscriptionObjects
             string parameterName = " ";
             string niceName = ProtoFluxTypeInfo.NiceName;
 
-            if (ProvidedParameters.Count > 0)
+            if (ProtoFluxTypeInfo.ParameterCount > 0)
             { 
                 // get the 1st parameter name
                 parameterName = ProvidedParameters[0].Name;
 
+                /*
                 if (!ProtoFluxTypeInfo.RequiresObjectParameter)
                 { 
                     // If a value parameter is required and not an object parameter, the parameter name should be in lowercase
                     parameterName = parameterName.ToLower();
                 }
+                */
+
+                // TODO: For object parameters, it's not clear or consistent as to when the parameter should be capitalized. 
+                // So for now, we'll always capitalize.
+                parameterName = parameterName.ToLower();
+
 
                 // Replace <T> with the actual type
                 if (niceName.Contains("<T>"))
@@ -48,7 +54,7 @@ namespace VoiceToProtoFlux.Objects.TranscriptionObjects
                 }
             }
 
-            return $"{ParameterCount}|{parameterName}|{buttonRelayArgument}|{niceName}";
+            return $"{ProtoFluxTypeInfo.ParameterCount}|{parameterName}|{buttonRelayArgument}|{niceName}";
         }
 
         public override string ToString()

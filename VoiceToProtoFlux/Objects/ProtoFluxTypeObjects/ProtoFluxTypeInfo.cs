@@ -27,7 +27,7 @@ namespace VoiceToProtoFlux.Objects.ProtoFluxTypeObjects
             Phrases = new List<string> { string.Join("", WordsOfNiceName) };
 
             // If Phrases contains "Object", then the type requires an object parameter
-            RequiresObjectParameter = Phrases.Contains("Object");
+            RequiresObjectParameter = NiceName.Contains("Object");
             
             // Generate additional phrases using synonyms
             GenerateAdditionalPhrases();
