@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Text;
+using System.Windows.Forms;
 
 namespace VoiceToProtoFlux.Objects
 {
@@ -15,6 +16,25 @@ namespace VoiceToProtoFlux.Objects
         private bool isListening = false;
         public delegate void MessageReceivedHandler(string message);
         public event MessageReceivedHandler? OnMessageReceived;
+
+        public enum CommandName
+        {
+            DISABLE_LISTENING,
+            ENABLE_LISTENING
+        }
+
+        private string GetCommandString(CommandName commandName)
+        {
+            switch (commandName)
+            {
+                case CommandName.DISABLE_LISTENING:
+                    return "DISABLE_LISTENING";
+                case CommandName.ENABLE_LISTENING:
+                    return "ENABLE_LISTENING";
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(commandName), commandName, null);
+            }
+        }
 
         public WebSocketServer(string uriPrefix)
         {
@@ -81,6 +101,13 @@ namespace VoiceToProtoFlux.Objects
                     await client.SendAsync(new ArraySegment<byte>(messageBytes), WebSocketMessageType.Text, true, CancellationToken.None);
                 }
             }
+        }
+
+        public async Task SendCommandToClient(CommandName commandName)
+        {
+            string commandToClient = $"CommandToClient_{GetCommandString(commandName)}";
+            await BroadcastMessageAsync(commandToClient);
+            System.Diagnostics.Debug.WriteLine($"Sent command to client: {commandToClient}");
         }
 
         public void Stop()

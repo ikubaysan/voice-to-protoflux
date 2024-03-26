@@ -83,18 +83,20 @@ namespace VoiceToProtoFlux.Objects
             return new Grammar(grammarBuilder);
         }
 
-        public void StartRecognition()
+        public async void StartRecognition()
         {
             if (recognitionActive) return;
             recognizer.RecognizeAsync(RecognizeMode.Multiple);
             recognitionActive = true;
+            await webSocketServer.SendCommandToClient(WebSocketServer.CommandName.ENABLE_LISTENING);
         }
 
-        public void StopRecognition()
+        public async void StopRecognition()
         {
             if (!recognitionActive) return;
             recognizer.RecognizeAsyncStop();
             recognitionActive = false;
+            await webSocketServer.SendCommandToClient(WebSocketServer.CommandName.DISABLE_LISTENING);
         }
 
         private async void Recognizer_SpeechRecognized(object? sender, SpeechRecognizedEventArgs e)
