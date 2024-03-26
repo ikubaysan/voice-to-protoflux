@@ -25,6 +25,10 @@ namespace VoiceToProtoFlux
             ProtoFluxTypeInfoCollection typeInfoCollection = ProtoFluxTypeLoader.LoadProtoFluxTypes();
             speechTranscriber = new SpeechTranscriber(rawTranscriptionListBox, typeInfoCollection, webSocketServer);
             speechTranscriber.AudioLevelUpdated += SpeechTranscriber_AudioLevelUpdated; // Subscribe to the new event
+
+
+            speechTranscriber.TranscriptionEnabledRequested += (sender, e) => EnableTranscription();
+            speechTranscriber.TranscriptionDisabledRequested += (sender, e) => DisableTranscription();
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -93,7 +97,7 @@ namespace VoiceToProtoFlux
             }
         }
 
-        private void transcriptionEnabledCheckBox_CheckedChanged(object sender, EventArgs e)
+        private void transcriptionEnabledCheckBox_Click(object sender, EventArgs e)
         {
             if (transcriptionEnabledCheckBox.Checked)
             {
@@ -104,5 +108,43 @@ namespace VoiceToProtoFlux
                 speechTranscriber.StopRecognition();
             }
         }
+
+
+
+        private void EnableTranscription()
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action(EnableTranscription));
+            }
+            else
+            {
+                if (!transcriptionEnabledCheckBox.Checked)
+                {
+                    transcriptionEnabledCheckBox.Checked = true;
+                    speechTranscriber.StartRecognition();
+                }
+            }
+        }
+
+        private void DisableTranscription()
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action(DisableTranscription));
+            }
+            else
+            {
+                if (transcriptionEnabledCheckBox.Checked)
+                {
+                    transcriptionEnabledCheckBox.Checked = false;
+                    speechTranscriber.StopRecognition();
+                }
+            }
+        }
+
+
+
+
     }
 }

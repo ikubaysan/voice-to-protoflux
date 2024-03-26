@@ -19,6 +19,8 @@ namespace VoiceToProtoFlux.Objects
         private readonly ProtoFluxTypeInfoCollection protoFluxTypeCollection;
         public event EventHandler<AudioLevelUpdatedEventArgs>? AudioLevelUpdated;
         public bool recognitionActive = false;
+        public event EventHandler? TranscriptionEnabledRequested;
+        public event EventHandler? TranscriptionDisabledRequested;
 
         public SpeechTranscriber(ListBox listBox, ProtoFluxTypeInfoCollection protoFluxTypeCollection, WebSocketServer webSocketServer)
         {
@@ -43,22 +45,25 @@ namespace VoiceToProtoFlux.Objects
             //recognizer.SpeechDetected += Recognizer_SpeechDetected;
             //recognizer.RecognizeCompleted += Recognizer_RecognizeCompleted;
             //recognizer.SpeechRecognitionRejected += Recognizer_SpeechRecognitionRejected;
+
+
             System.Diagnostics.Debug.WriteLine("SpeechTranscriber initialized.");
         }
 
         private void WebSocketServer_OnMessageReceived(string message)
         {
-            if (message == "StartTranscription")
+            if (message == "EnableListening")
             {
-                StartRecognition();
-                System.Diagnostics.Debug.WriteLine("StartTranscription command received.");
+                TranscriptionEnabledRequested?.Invoke(this, EventArgs.Empty);
+                System.Diagnostics.Debug.WriteLine("EnableListening command received.");
             }
-            else if (message == "StopTranscription")
+            else if (message == "DisableListening")
             {
-                StopRecognition();
-                System.Diagnostics.Debug.WriteLine("StopTranscription command received.");
+                TranscriptionDisabledRequested?.Invoke(this, EventArgs.Empty);
+                System.Diagnostics.Debug.WriteLine("DisableListening command received.");
             }
         }
+
 
         private Grammar ConstructCustomGrammar()
         {
