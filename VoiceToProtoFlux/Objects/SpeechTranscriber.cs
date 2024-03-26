@@ -26,6 +26,8 @@ namespace VoiceToProtoFlux.Objects
             this.protoFluxTypeCollection = protoFluxTypeCollection;
             this.webSocketServer = webSocketServer;
 
+            webSocketServer.OnMessageReceived += WebSocketServer_OnMessageReceived;
+
             recognizer = new SpeechRecognitionEngine(new System.Globalization.CultureInfo("en-US"));
             recognizer.LoadGrammar(ConstructCustomGrammar());
 
@@ -42,6 +44,20 @@ namespace VoiceToProtoFlux.Objects
             //recognizer.RecognizeCompleted += Recognizer_RecognizeCompleted;
             //recognizer.SpeechRecognitionRejected += Recognizer_SpeechRecognitionRejected;
             System.Diagnostics.Debug.WriteLine("SpeechTranscriber initialized.");
+        }
+
+        private void WebSocketServer_OnMessageReceived(string message)
+        {
+            if (message == "StartTranscription")
+            {
+                StartRecognition();
+                System.Diagnostics.Debug.WriteLine("StartTranscription command received.");
+            }
+            else if (message == "StopTranscription")
+            {
+                StopRecognition();
+                System.Diagnostics.Debug.WriteLine("StopTranscription command received.");
+            }
         }
 
         private Grammar ConstructCustomGrammar()

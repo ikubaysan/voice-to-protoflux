@@ -13,6 +13,8 @@ namespace VoiceToProtoFlux.Objects
         private HttpListener httpListener;
         private List<WebSocket> clients = new List<WebSocket>();
         private bool isListening = false;
+        public delegate void MessageReceivedHandler(string message);
+        public event MessageReceivedHandler? OnMessageReceived;
 
         public WebSocketServer(string uriPrefix)
         {
@@ -52,9 +54,14 @@ namespace VoiceToProtoFlux.Objects
                 byte[] receiveBuffer = new byte[1024];
                 while (webSocket.State == WebSocketState.Open)
                 {
-                    await webSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
-                    // Echo test, optional
-                    // await webSocket.SendAsync(new ArraySegment<byte>(receiveBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
+                    // Replace the above line with the following block
+                    var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
+                    if (result.MessageType == WebSocketMessageType.Text)
+                    {
+                        string message = Encoding.UTF8.GetString(receiveBuffer, 0, result.Count);
+                        System.Diagnostics.Debug.WriteLine($"Message received: {message}");
+                        OnMessageReceived?.Invoke(message);
+                    }
                 }
             }
             finally
