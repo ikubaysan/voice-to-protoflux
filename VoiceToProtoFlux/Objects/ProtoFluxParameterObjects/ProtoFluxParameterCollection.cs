@@ -22,7 +22,8 @@ namespace VoiceToProtoFlux.Objects
                 { "Double", new ProtoFluxParameter("Double") },
                 { "Uint", new ProtoFluxParameter("Uint") },
                 { "Ulong", new ProtoFluxParameter("Ulong") },
-                { "Slot", new ProtoFluxParameter("Slot") }
+                { "Slot", new ProtoFluxParameter("Slot") },
+                { "URI", new ProtoFluxParameter("URI") }
             };
         }
 

@@ -24,7 +24,8 @@ namespace VoiceToProtoFlux.Objects
             {"approximately", new List<string> { "Approx" }},
             {"dynamic", new List<string> { "Dy", "Dyn" }},
             {"bool", new List<string> { "Boolean" } },
-            {"reference", new List<string> { "Ref" }}
+            {"reference", new List<string> { "Ref" }},
+            {"uri", new List<string> { "URL" }}
         };
 
         // Since we no longer have a constructor, we initialize the dictionary directly above.
