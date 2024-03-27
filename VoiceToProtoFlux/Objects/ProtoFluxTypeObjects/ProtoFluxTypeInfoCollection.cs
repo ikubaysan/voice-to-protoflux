@@ -7,6 +7,7 @@ namespace VoiceToProtoFlux.Objects.ProtoFluxTypeObjects
     {
         public List<ProtoFluxTypeInfo> typeInfos = new List<ProtoFluxTypeInfo>();
         private Dictionary<string, ProtoFluxTypeInfo> phraseMap = new Dictionary<string, ProtoFluxTypeInfo>(StringComparer.OrdinalIgnoreCase);
+        private Dictionary<string, ProtoFluxTypeInfo> nicePathMap = new Dictionary<string, ProtoFluxTypeInfo>(StringComparer.OrdinalIgnoreCase);
 
         public void AddTypeInfo(ProtoFluxTypeInfo typeInfo)
         {
@@ -24,11 +25,23 @@ namespace VoiceToProtoFlux.Objects.ProtoFluxTypeObjects
                     phraseMap[phrase] = typeInfo;
                 }
             }
+
+            if (!nicePathMap.ContainsKey(typeInfo.NicePath))
+            {
+                nicePathMap[typeInfo.NicePath] = typeInfo;
+            }
+
         }
 
         public ProtoFluxTypeInfo? GetTypeInfoByPhrase(string phrase)
         {
             phraseMap.TryGetValue(phrase, out ProtoFluxTypeInfo? typeInfo);
+            return typeInfo;
+        }
+
+        public ProtoFluxTypeInfo? GetTypeInfoByNicePath(string nicePath)
+        {
+            nicePathMap.TryGetValue(nicePath, out ProtoFluxTypeInfo? typeInfo);
             return typeInfo;
         }
 

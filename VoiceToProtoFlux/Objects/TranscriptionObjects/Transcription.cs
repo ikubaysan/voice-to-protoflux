@@ -24,8 +24,6 @@ namespace VoiceToProtoFlux.Objects.TranscriptionObjects
 
         public string ToWebsocketString()
         {
-            string buttonRelayArgument = "";
-            buttonRelayArgument += ProtoFluxTypeInfo.FullName;
             string parameterName = " ";
             string niceName = ProtoFluxTypeInfo.NiceName;
 
@@ -54,7 +52,8 @@ namespace VoiceToProtoFlux.Objects.TranscriptionObjects
                 }
             }
 
-            return $"Type0_{ProtoFluxTypeInfo.ParameterCount}|{parameterName}|{buttonRelayArgument}|{ProtoFluxTypeInfo.NicePath}|{niceName}";
+            // the button relay argument is ProtoFluxTypeInfo.FullName
+            return $"Type0_{ProtoFluxTypeInfo.ParameterCount}|{parameterName}|{ProtoFluxTypeInfo.FullName}|{ProtoFluxTypeInfo.NicePath}|{niceName}";
         }
 
         public override string ToString()

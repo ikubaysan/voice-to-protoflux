@@ -22,13 +22,15 @@ namespace VoiceToProtoFlux.Objects
         public event EventHandler? TranscriptionEnabledRequested;
         public event EventHandler? TranscriptionDisabledRequested;
 
+        public const int MAX_SEARCH_RESULTS = 50;
+
         public SpeechTranscriber(ListBox listBox, ProtoFluxTypeInfoCollection protoFluxTypeCollection, WebSocketServer webSocketServer)
         {
             transcriptionListBox = listBox;
             this.protoFluxTypeCollection = protoFluxTypeCollection;
             this.webSocketServer = webSocketServer;
 
-            webSocketServer.OnMessageReceived += WebSocketServer_OnMessageReceived;
+            webSocketServer.OnMessageReceived += WebSocketServer_OnMessageReceivedAsync;
 
             recognizer = new SpeechRecognitionEngine(new System.Globalization.CultureInfo("en-US"));
             recognizer.LoadGrammar(ConstructCustomGrammar());
@@ -50,17 +52,79 @@ namespace VoiceToProtoFlux.Objects
             System.Diagnostics.Debug.WriteLine("SpeechTranscriber initialized.");
         }
 
-        private void WebSocketServer_OnMessageReceived(string message)
+        private async void WebSocketServer_OnMessageReceivedAsync(string message)
         {
-            if (message == "EnableListening")
+            if (message.StartsWith("Search:"))
             {
-                TranscriptionEnabledRequested?.Invoke(this, EventArgs.Empty);
+                var query = message.Substring(7).Trim().ToLower(); // Convert the search query to lower case for case-insensitive comparison
+                var keywords = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries); // Split by space to get keywords
+
+                System.Diagnostics.Debug.WriteLine($"Received search query: {query}");
+
+                // Ensure all keywords are present in NiceName (case-insensitive search) using "AND" logic
+                var matchedTypeInfos = protoFluxTypeCollection.typeInfos
+                    .Where(typeInfo => keywords.All(keyword => typeInfo.NiceName.ToLower().Contains(keyword)))
+                    .ToList();
+
+                // Sort alphabetically by NicePath
+                matchedTypeInfos.Sort((a, b) => a.NicePath.CompareTo(b.NicePath));
+
+                var responseMessage = new StringBuilder("Type2_");
+
+                /*
+                responseMessage.AppendFormat($"{matchedTypeInfos.Count}");
+                foreach (var typeInfo in matchedTypeInfos)
+                {
+                    responseMessage.AppendFormat($"|{typeInfo.NicePath}");
+                }
+                */
+
+                foreach (var typeInfo in matchedTypeInfos)
+                { 
+                    responseMessage.AppendFormat($"{typeInfo.NicePath}\n");
+                }
+
+                webSocketServer.BroadcastMessageAsync(responseMessage.ToString()).Wait(); // Send the response message
+            }
+            else if (message.StartsWith("SearchResultNicePathSelected:"))
+            {
+                string nicePath = message.Substring(29).Trim();
+
+                System.Diagnostics.Debug.WriteLine($"SearchResultNicePathSelected - NicePath: {nicePath}");
+
+                var typeInfo = protoFluxTypeCollection.GetTypeInfoByNicePath(nicePath);
+                if (typeInfo == null)
+                { 
+                    System.Diagnostics.Debug.WriteLine($"SearchResultNicePathSelected - Type info not found for NicePath: {nicePath}");
+                    return;
+                }
+
+                // Act as if the type was recognized via speech
+
+                var transcriptionCollection = new TranscriptionCollection();
+                List<ProtoFluxParameter> providedParameters = new List<ProtoFluxParameter>();
+                if (typeInfo.ParameterCount > 0)
+                {
+                    providedParameters.Add(ProtoFluxParameterCollection.Instance.GetDefaultParameter());
+                }
+
+                Transcription transcription = new Transcription(protoFluxTypeInfo: typeInfo,
+                                                                providedParameters: providedParameters,
+                                                                 confidence: 1.0f);
+
+                // Add each transcription alternative to the TranscriptionsCollection
+                transcriptionCollection.AddTranscription(transcription);
+                await webSocketServer.BroadcastMessageAsync(transcription.ToWebsocketString());
+            }
+            else if (message == "EnableListening")
+            {
                 System.Diagnostics.Debug.WriteLine("EnableListening command received.");
+                TranscriptionEnabledRequested?.Invoke(this, EventArgs.Empty);
             }
             else if (message == "DisableListening")
             {
-                TranscriptionDisabledRequested?.Invoke(this, EventArgs.Empty);
                 System.Diagnostics.Debug.WriteLine("DisableListening command received.");
+                TranscriptionDisabledRequested?.Invoke(this, EventArgs.Empty);
             }
         }
 
@@ -204,6 +268,4 @@ namespace VoiceToProtoFlux.Objects
         }
 
     }
-
-
 }
