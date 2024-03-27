@@ -45,9 +45,7 @@ namespace VoiceToProtoFlux
             isAudioDetectionConfirmedLabel.Text = "Audio detection not confirmed";
             isAudioDetectionConfirmedLabel.ForeColor = Color.Red;
 
-            transcriptionEnabledCheckBox.Checked = true;
-            speechTranscriber.StartRecognition();
-
+            transcriptionEnabledCheckBox.Checked = false;
             return;
         }
 
