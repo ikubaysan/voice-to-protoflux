@@ -7,18 +7,19 @@ namespace VoiceToProtoFlux.Objects.ProtoFluxTypeObjects
     {
         public string FullName { get; set; }
         public string NiceName { get; set; }
-        public string FullCategory { get; set; }
+        public string NicePath { get; set; }
         public string NiceCategory { get; set; }
         public int ParameterCount { get; set; }
         public bool RequiresObjectParameter { get; set; }
         public List<string> WordsOfNiceName { get; set; }
         public List<string> Phrases { get; set; }
 
-        public ProtoFluxTypeInfo(string fullName, string niceName, string fullCategory, string niceCategory, int parameterCount, List<string> wordsOfNiceName)
+        public ProtoFluxTypeInfo(string fullName, string niceName, string niceCategory, string nicePath, int parameterCount, List<string> wordsOfNiceName)
         {
             FullName = fullName;
             NiceName = niceName;
-            FullCategory = fullCategory;
+            NiceCategory = niceCategory;
+            NicePath = nicePath;
             NiceCategory = niceCategory;
             ParameterCount = parameterCount;
             WordsOfNiceName = wordsOfNiceName;

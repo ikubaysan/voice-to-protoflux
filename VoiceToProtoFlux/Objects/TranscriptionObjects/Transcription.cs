@@ -54,7 +54,7 @@ namespace VoiceToProtoFlux.Objects.TranscriptionObjects
                 }
             }
 
-            return $"{ProtoFluxTypeInfo.ParameterCount}|{parameterName}|{buttonRelayArgument}|{niceName}";
+            return $"Type0_{ProtoFluxTypeInfo.ParameterCount}|{parameterName}|{buttonRelayArgument}|{ProtoFluxTypeInfo.NicePath}|{niceName}";
         }
 
         public override string ToString()

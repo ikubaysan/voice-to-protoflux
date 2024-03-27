@@ -24,7 +24,7 @@ namespace VoiceToProtoFlux
 
             ProtoFluxTypeInfoCollection typeInfoCollection = ProtoFluxTypeLoader.LoadProtoFluxTypes();
             speechTranscriber = new SpeechTranscriber(rawTranscriptionListBox, typeInfoCollection, webSocketServer);
-            speechTranscriber.AudioLevelUpdated += SpeechTranscriber_AudioLevelUpdated; // Subscribe to the new event
+            speechTranscriber.AudioLevelUpdated += SpeechTranscriber_AudioLevelUpdated;
 
 
             speechTranscriber.TranscriptionEnabledRequested += (sender, e) => EnableTranscription();

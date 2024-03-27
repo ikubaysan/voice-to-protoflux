@@ -105,7 +105,7 @@ namespace VoiceToProtoFlux.Objects
 
         public async Task SendCommandToClient(CommandName commandName)
         {
-            string commandToClient = $"CommandToClient_{GetCommandString(commandName)}";
+            string commandToClient = $"Type1_{GetCommandString(commandName)}";
             await BroadcastMessageAsync(commandToClient);
             System.Diagnostics.Debug.WriteLine($"Sent command to client: {commandToClient}");
         }
