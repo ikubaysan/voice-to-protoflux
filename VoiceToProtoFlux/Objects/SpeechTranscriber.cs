@@ -32,6 +32,8 @@ namespace VoiceToProtoFlux.Objects
 
             webSocketServer.OnMessageReceived += WebSocketServer_OnMessageReceivedAsync;
 
+            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+            System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("en-US");
             recognizer = new SpeechRecognitionEngine(new System.Globalization.CultureInfo("en-US"));
             recognizer.LoadGrammar(ConstructCustomGrammar());
 
