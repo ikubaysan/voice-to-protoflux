@@ -15,10 +15,14 @@ namespace VoiceToProtoFlux
         private SpeechTranscriber speechTranscriber;
         private string defaultMicrophoneName = "Unknown Microphone";
         private WebSocketServer webSocketServer;
+        private ConfigManager configManager;
 
         public Form1()
         {
             InitializeComponent();
+            configManager = new ConfigManager();
+            // Subscribe to the Shown event
+            this.Shown += Form1_Shown;
             IdentifyDefaultMicrophone();
             webSocketServer = new WebSocketServer("http://localhost:7159/");
             Task.Run(() => webSocketServer.StartAsync());
@@ -27,9 +31,13 @@ namespace VoiceToProtoFlux
             speechTranscriber = new SpeechTranscriber(rawTranscriptionListBox, typeInfoCollection, webSocketServer);
             speechTranscriber.AudioLevelUpdated += SpeechTranscriber_AudioLevelUpdated;
 
-
             speechTranscriber.TranscriptionEnabledRequested += (sender, e) => EnableTranscription();
             speechTranscriber.TranscriptionDisabledRequested += (sender, e) => DisableTranscription();
+        }
+
+        private void Form1_Shown(object sender, EventArgs e)
+        {
+            configManager.LoadConfig(); // Now this is called when the form is shown
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
