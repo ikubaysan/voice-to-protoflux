@@ -3,7 +3,7 @@ import azure.cognitiveservices.speech as speechsdk
 
 def main():
     # Set up the Speech SDK with your Azure subscription key and service region
-    speech_key, service_region = "43f11dfc6b874275a60d33acad039d93", "westus"
+    speech_key, service_region = "apikeyhere", "westus"
     speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_region)
 
     # Set up the audio config for the microphone
