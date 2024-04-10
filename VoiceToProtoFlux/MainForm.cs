@@ -10,14 +10,15 @@ using VoiceToProtoFlux.Objects.SpeechTranscriberObjects;
 
 namespace VoiceToProtoFlux
 {
-    public partial class Form1 : Form
+    public partial class MainForm : Form
     {
         private SpeechTranscriber speechTranscriber;
         private string defaultMicrophoneName = "Unknown Microphone";
         private WebSocketServer webSocketServer;
         private ConfigManager configManager;
+        private AzureSpeechTranscriber azureSpeechTranscriber;
 
-        public Form1()
+        public MainForm()
         {
             InitializeComponent();
             configManager = new ConfigManager();
@@ -28,16 +29,19 @@ namespace VoiceToProtoFlux
             Task.Run(() => webSocketServer.StartAsync());
 
             ProtoFluxTypeInfoCollection typeInfoCollection = ProtoFluxTypeLoader.LoadProtoFluxTypes();
+
+            /*
             speechTranscriber = new SpeechTranscriber(rawTranscriptionListBox, typeInfoCollection, webSocketServer);
             speechTranscriber.AudioLevelUpdated += SpeechTranscriber_AudioLevelUpdated;
-
             speechTranscriber.TranscriptionEnabledRequested += (sender, e) => EnableTranscription();
             speechTranscriber.TranscriptionDisabledRequested += (sender, e) => DisableTranscription();
+            */
         }
 
         private void Form1_Shown(object sender, EventArgs e)
         {
             configManager.LoadConfig(); // Now this is called when the form is shown
+            azureSpeechTranscriber = new AzureSpeechTranscriber(configManager);
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -108,17 +112,19 @@ namespace VoiceToProtoFlux
         {
             if (transcriptionEnabledCheckBox.Checked)
             {
-                speechTranscriber.StartRecognition();
+                //speechTranscriber.StartRecognition();
+                azureSpeechTranscriber.StartRecognitionAsync();
             }
             else
             {
-                speechTranscriber.StopRecognition();
+                //speechTranscriber.StopRecognition();
+                azureSpeechTranscriber.StopRecognitionAsync();
             }
         }
 
 
 
-        private void EnableTranscription()
+        private async void EnableTranscription()
         {
             if (this.InvokeRequired)
             {
@@ -129,12 +135,13 @@ namespace VoiceToProtoFlux
                 if (!transcriptionEnabledCheckBox.Checked)
                 {
                     transcriptionEnabledCheckBox.Checked = true;
-                    speechTranscriber.StartRecognition();
+                    //speechTranscriber.StartRecognition();
+                    await azureSpeechTranscriber.StartRecognitionAsync();
                 }
             }
         }
 
-        private void DisableTranscription()
+        private async void DisableTranscription()
         {
             if (this.InvokeRequired)
             {
@@ -145,7 +152,8 @@ namespace VoiceToProtoFlux
                 if (transcriptionEnabledCheckBox.Checked)
                 {
                     transcriptionEnabledCheckBox.Checked = false;
-                    speechTranscriber.StopRecognition();
+                    // speechTranscriber.StopRecognition();
+                    await azureSpeechTranscriber.StopRecognitionAsync();
                 }
             }
         }
