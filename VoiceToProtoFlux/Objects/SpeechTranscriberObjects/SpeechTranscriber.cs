@@ -7,7 +7,7 @@ using VoiceToProtoFlux.Objects.ProtoFluxParameterObjects;
 using VoiceToProtoFlux.Objects.ProtoFluxTypeObjects;
 using VoiceToProtoFlux.Objects.TranscriptionObjects;
 
-namespace VoiceToProtoFlux.Objects
+namespace VoiceToProtoFlux.Objects.SpeechTranscriberObjects
 {
     public class SpeechTranscriber
     {
@@ -32,8 +32,8 @@ namespace VoiceToProtoFlux.Objects
 
             webSocketServer.OnMessageReceived += WebSocketServer_OnMessageReceivedAsync;
 
-            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
-            System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("en-US");
+            Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+            Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("en-US");
             recognizer = new SpeechRecognitionEngine(new System.Globalization.CultureInfo("en-US"));
             recognizer.LoadGrammar(ConstructCustomGrammar());
 
@@ -82,7 +82,7 @@ namespace VoiceToProtoFlux.Objects
                 */
 
                 foreach (var typeInfo in matchedTypeInfos)
-                { 
+                {
                     responseMessage.AppendFormat($"{typeInfo.NicePath}\n");
                 }
 
@@ -96,7 +96,7 @@ namespace VoiceToProtoFlux.Objects
 
                 var typeInfo = protoFluxTypeCollection.GetTypeInfoByNicePath(nicePath);
                 if (typeInfo == null)
-                { 
+                {
                     System.Diagnostics.Debug.WriteLine($"SearchResultNicePathSelected - Type info not found for NicePath: {nicePath}");
                     return;
                 }

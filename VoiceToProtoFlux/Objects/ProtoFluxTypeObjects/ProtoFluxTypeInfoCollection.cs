@@ -6,6 +6,7 @@ namespace VoiceToProtoFlux.Objects.ProtoFluxTypeObjects
     public class ProtoFluxTypeInfoCollection
     {
         public List<ProtoFluxTypeInfo> typeInfos = new List<ProtoFluxTypeInfo>();
+        public List<string> uniqueWords = new List<string>();
         private Dictionary<string, ProtoFluxTypeInfo> phraseMap = new Dictionary<string, ProtoFluxTypeInfo>(StringComparer.OrdinalIgnoreCase);
         private Dictionary<string, ProtoFluxTypeInfo> nicePathMap = new Dictionary<string, ProtoFluxTypeInfo>(StringComparer.OrdinalIgnoreCase);
 
@@ -31,6 +32,13 @@ namespace VoiceToProtoFlux.Objects.ProtoFluxTypeObjects
                 nicePathMap[typeInfo.NicePath] = typeInfo;
             }
 
+            foreach (var word in typeInfo.WordsOfNiceName)
+            {
+                if (!uniqueWords.Contains(word))
+                {
+                    uniqueWords.Add(word);
+                }
+            }
         }
 
         public ProtoFluxTypeInfo? GetTypeInfoByPhrase(string phrase)

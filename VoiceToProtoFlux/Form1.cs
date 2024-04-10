@@ -6,6 +6,7 @@ using System.Linq;
 using VoiceToProtoFlux.Objects.ProtoFluxTypeObjects;
 using VoiceToProtoFlux.Objects;
 using System.Speech.Recognition;
+using VoiceToProtoFlux.Objects.SpeechTranscriberObjects;
 
 namespace VoiceToProtoFlux
 {
