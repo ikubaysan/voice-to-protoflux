@@ -6,7 +6,6 @@ namespace VoiceToProtoFlux.Objects.ProtoFluxTypeObjects
     public class ProtoFluxTypeInfoCollection
     {
         public List<ProtoFluxTypeInfo> typeInfos = new List<ProtoFluxTypeInfo>();
-        public List<string> uniqueWords = new List<string>();
         private Dictionary<string, ProtoFluxTypeInfo> phraseMap = new Dictionary<string, ProtoFluxTypeInfo>(StringComparer.OrdinalIgnoreCase);
         private Dictionary<string, ProtoFluxTypeInfo> nicePathMap = new Dictionary<string, ProtoFluxTypeInfo>(StringComparer.OrdinalIgnoreCase);
 
@@ -31,15 +30,33 @@ namespace VoiceToProtoFlux.Objects.ProtoFluxTypeObjects
             {
                 nicePathMap[typeInfo.NicePath] = typeInfo;
             }
+        }
 
-            foreach (var word in typeInfo.WordsOfNiceName)
+
+        public List<ProtoFluxTypeInfo> FindBestMatchingTypeInfoByWords(List<string> words)
+        {
+            // Returning a list because there could be multiple best matches
+            List<ProtoFluxTypeInfo> bestMatches = new List<ProtoFluxTypeInfo>();
+            int bestMatchCount = 0;
+            foreach (var typeInfo in typeInfos)
             {
-                if (!uniqueWords.Contains(word))
+                int matchCount = words.Count(word => typeInfo.WordsOfNiceName.Contains(word));
+                if (matchCount > bestMatchCount)
                 {
-                    uniqueWords.Add(word);
+                    bestMatches.Clear(); // Clear previous best matches as we found a better match
+                    bestMatches.Add(typeInfo); // Add this typeInfo as the current best match
+                    bestMatchCount = matchCount; // Update the best match count
+                }
+                else if (matchCount == bestMatchCount && bestMatchCount > 0)
+                {
+                    // If this item matches as well as the current best, add it to the list of best matches
+                    bestMatches.Add(typeInfo);
                 }
             }
+            return bestMatches; // Return the list of best matches (can be empty if no matches found)
         }
+
+
 
         public ProtoFluxTypeInfo? GetTypeInfoByPhrase(string phrase)
         {
@@ -54,7 +71,7 @@ namespace VoiceToProtoFlux.Objects.ProtoFluxTypeObjects
         }
 
         // Method to determine a unique set of the WordsOfNiceName values from all ProtoFluxTypeInfo objects
-        public HashSet<string> GetUniqueWordsOfNiceName()
+        public HashSet<string> GetUniqueWordsOfNiceNames()
         {
             var uniqueWords = new HashSet<string>();
             foreach (var typeInfo in typeInfos)

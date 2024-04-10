@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace VoiceToProtoFlux.Objects.SpeechTranscriberObjects
 {
-    internal class SpeechTranscriberGrammar
+    public class SpeechTranscriberGrammar
     {
         public List<string> Phrases { get; set; }
 
