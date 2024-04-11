@@ -26,7 +26,12 @@ namespace VoiceToProtoFlux.Objects.TranscriptionObjects
             string niceName = ProtoFluxTypeInfo.NiceName;
 
             if (ProtoFluxTypeInfo.ParameterCount > 0)
-            { 
+            {
+                if (ProvidedParameters.Count == 0)
+                { 
+                    ProvidedParameters.Add(ProtoFluxParameterCollection.Instance.GetDefaultParameter());
+                }
+
                 // get the 1st parameter name
                 parameterName = ProvidedParameters[0].Name;
 

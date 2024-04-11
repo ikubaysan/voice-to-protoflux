@@ -17,6 +17,26 @@ namespace VoiceToProtoFlux.Objects.SpeechTranscriberObjects
         private ProtoFluxTypeInfoCollection protoFluxTypeInfoCollection;
         private WebSocketServer webSocketServer;
 
+        public event Action<bool> RecognitionEnabledChanged;
+
+        private bool _recognitionEnabled = false;
+        public bool recognitionEnabled
+        {
+            get => _recognitionEnabled;
+            private set
+            {
+                if (_recognitionEnabled != value)
+                {
+                    _recognitionEnabled = value;
+                    // Trigger the event when the value changes.
+                    RecognitionEnabledChanged?.Invoke(_recognitionEnabled);
+                }
+            }
+        }
+
+
+
+
         public AzureSpeechTranscriber(ConfigManager configManager, WebSocketServer webSocketServer, ProtoFluxTypeInfoCollection protoFluxTypeInfoCollection, List<string> grammarPhrases)
         {
             this.configManager = configManager;
@@ -95,6 +115,20 @@ namespace VoiceToProtoFlux.Objects.SpeechTranscriberObjects
 
                 List<ProtoFluxParameter> protoFluxParameters = new List<ProtoFluxParameter>();
 
+                if (bestTypeMatch.ParameterCount > 0)
+                {
+                    ProtoFluxParameter? bestParameterMatch = ProtoFluxParameterCollection.Instance.FindBestMatchingParameterByWords(parameterWords);
+                    if (bestParameterMatch != null)
+                    {
+                        protoFluxParameters.Add(bestParameterMatch);
+                        Debug.WriteLine($"Best parameter match: {bestParameterMatch.Name}");
+                    }
+                    else
+                    {
+                        Debug.WriteLine($"No parameter matches found.");
+                    }
+                }
+
                 Transcription transcription = new Transcription(protoFluxTypeInfo: bestTypeMatch, providedParameters: protoFluxParameters);
 
                 await webSocketServer.BroadcastMessageAsync(transcription.ToWebsocketString());
@@ -123,11 +157,15 @@ namespace VoiceToProtoFlux.Objects.SpeechTranscriberObjects
         public async Task StartRecognitionAsync()
         {
             await recognizer.StartContinuousRecognitionAsync().ConfigureAwait(false);
+            await webSocketServer.SendCommandToClient(WebSocketServer.CommandName.ENABLE_LISTENING);
+            recognitionEnabled = true;
         }
 
         public async Task StopRecognitionAsync()
         {
             await recognizer.StopContinuousRecognitionAsync().ConfigureAwait(false);
+            await webSocketServer.SendCommandToClient(WebSocketServer.CommandName.DISABLE_LISTENING);
+            recognitionEnabled = false;
         }
     }
 }

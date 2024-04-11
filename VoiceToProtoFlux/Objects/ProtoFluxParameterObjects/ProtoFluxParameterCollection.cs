@@ -31,6 +31,16 @@ namespace VoiceToProtoFlux.Objects
             get { return instance; }
         }
 
+        public List<string> GetParameterNames()
+        {
+            return Parameters.Keys.ToList();
+        }
+
+        public List<string> GetParameterNamesLowerCased()
+        {
+            return Parameters.Keys.Select(key => key.ToLowerInvariant()).ToList();
+        }
+
         public ProtoFluxParameter GetDefaultParameter()
         {
             return Parameters["Int"];
@@ -59,5 +69,40 @@ namespace VoiceToProtoFlux.Objects
             }
             return null;
         }
+
+        public ProtoFluxParameter? FindBestMatchingParameterByWords(List<string> words)
+        {
+            // Preprocess words: lowercase and trim non-alphanumeric characters at the end if applicable
+            var processedWords = words.Select(word =>
+            {
+                // Convert the word to lowercase
+                string lowerCasedWord = word.ToLowerInvariant();
+
+                // If the word is more than one character long and ends with a non-alphanumeric character,
+                // remove the last character
+                if (lowerCasedWord.Length > 1 && !char.IsLetterOrDigit(lowerCasedWord[^1]))
+                {
+                    lowerCasedWord = lowerCasedWord.Substring(0, lowerCasedWord.Length - 1);
+                }
+
+                return lowerCasedWord;
+            }).ToList();
+
+
+            List<string> parameterNamesLowercased = GetParameterNamesLowerCased();
+            foreach (var processedWord in processedWords)
+            {
+                if (parameterNamesLowercased.Contains(processedWord))
+                {
+                    if (Parameters.TryGetValue(processedWord, out var parameter))
+                    {
+                        return parameter;
+                    }
+                }
+            }
+
+            return null;
+        }
+
     }
 }

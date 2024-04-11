@@ -27,20 +27,8 @@ namespace VoiceToProtoFlux
             this.Shown += Form1_Shown;
             IdentifyDefaultMicrophone();
             webSocketServer = new WebSocketServer("http://localhost:7159/");
-            Task.Run(() => webSocketServer.StartAsync());
 
             typeInfoCollection = ProtoFluxTypeLoader.LoadProtoFluxTypes();
-
-            /*
-            speechTranscriber = new SpeechTranscriber(rawTranscriptionListBox, typeInfoCollection, webSocketServer);
-            speechTranscriber.AudioLevelUpdated += SpeechTranscriber_AudioLevelUpdated;
-            speechTranscriber.TranscriptionEnabledRequested += (sender, e) => EnableTranscription();
-            speechTranscriber.TranscriptionDisabledRequested += (sender, e) => DisableTranscription();
-            */
-        }
-
-        private void Form1_Shown(object sender, EventArgs e)
-        {
             configManager.LoadConfig(); // Now this is called when the form is shown
 
             // Convert HashSet to List
@@ -58,14 +46,41 @@ namespace VoiceToProtoFlux
             }
 
             SynonymManager.GetAllWords().ForEach(word => grammarWords.Add(word));
+            ProtoFluxParameterCollection.Instance.GetParameterNames().ForEach(word => grammarWords.Add(word));
 
             // Pass the list to AzureSpeechTranscriber
             azureSpeechTranscriber = new AzureSpeechTranscriber(
-                configManager, 
+                configManager,
                 webSocketServer,
-                typeInfoCollection, 
+                typeInfoCollection,
                 grammarWords.ToList()
                 );
+
+            var messageHandler = new WebSocketServerReceivedMessageHandler(webSocketServer, azureSpeechTranscriber, typeInfoCollection);
+
+            // Adjusting the event subscription to accommodate async method
+            webSocketServer.OnMessageReceived += (message) =>
+            {
+                // The _ = is used to explicitly discard the Task returned by the async method.
+                // This acknowledges that we're intentionally not awaiting the Task.
+                _ = messageHandler.OnMessageReceivedAsync(message);
+            };
+
+            Task.Run(() => webSocketServer.StartAsync());
+
+            transcriptionEnabledCheckBox.Checked = false;
+            azureSpeechTranscriber.RecognitionEnabledChanged += OnRecognitionEnabledChanged;
+        }
+
+
+        private void Form1_Shown(object sender, EventArgs e)
+        {
+            if (configManager.TerminalMessageBoxNeeded)
+            {
+                MessageBox.Show(configManager.TerminalMessageBoxText);
+                Application.Exit();
+            }
+
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -76,8 +91,20 @@ namespace VoiceToProtoFlux
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            transcriptionEnabledCheckBox.Checked = false;
             return;
+        }
+
+        private void OnRecognitionEnabledChanged(bool enabled)
+        {
+            // Marshal the call onto the UI thread
+            if (InvokeRequired)
+            {
+                Invoke(new Action<bool>(OnRecognitionEnabledChanged), enabled);
+            }
+            else
+            {
+                transcriptionEnabledCheckBox.Checked = enabled;
+            }
         }
 
         private void IdentifyDefaultMicrophone()
@@ -109,40 +136,6 @@ namespace VoiceToProtoFlux
             {
                 //speechTranscriber.StopRecognition();
                 azureSpeechTranscriber.StopRecognitionAsync();
-            }
-        }
-
-        private async void EnableTranscription()
-        {
-            if (this.InvokeRequired)
-            {
-                this.Invoke(new Action(EnableTranscription));
-            }
-            else
-            {
-                if (!transcriptionEnabledCheckBox.Checked)
-                {
-                    transcriptionEnabledCheckBox.Checked = true;
-                    //speechTranscriber.StartRecognition();
-                    await azureSpeechTranscriber.StartRecognitionAsync();
-                }
-            }
-        }
-
-        private async void DisableTranscription()
-        {
-            if (this.InvokeRequired)
-            {
-                this.Invoke(new Action(DisableTranscription));
-            }
-            else
-            {
-                if (transcriptionEnabledCheckBox.Checked)
-                {
-                    transcriptionEnabledCheckBox.Checked = false;
-                    // speechTranscriber.StopRecognition();
-                    await azureSpeechTranscriber.StopRecognitionAsync();
-                }
             }
         }
     }
