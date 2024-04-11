@@ -6,7 +6,6 @@ namespace VoiceToProtoFlux.Objects.ProtoFluxTypeObjects
     public class ProtoFluxTypeInfoCollection
     {
         public List<ProtoFluxTypeInfo> typeInfos = new List<ProtoFluxTypeInfo>();
-        private Dictionary<string, ProtoFluxTypeInfo> phraseMap = new Dictionary<string, ProtoFluxTypeInfo>(StringComparer.OrdinalIgnoreCase);
         private Dictionary<string, ProtoFluxTypeInfo> nicePathMap = new Dictionary<string, ProtoFluxTypeInfo>(StringComparer.OrdinalIgnoreCase);
 
         public void AddTypeInfo(ProtoFluxTypeInfo typeInfo)
@@ -18,13 +17,6 @@ namespace VoiceToProtoFlux.Objects.ProtoFluxTypeObjects
             }
 
             typeInfos.Add(typeInfo);
-            foreach (var phrase in typeInfo.Phrases)
-            {
-                if (!phraseMap.ContainsKey(phrase))
-                {
-                    phraseMap[phrase] = typeInfo;
-                }
-            }
 
             if (!nicePathMap.ContainsKey(typeInfo.NicePath))
             {
@@ -38,14 +30,36 @@ namespace VoiceToProtoFlux.Objects.ProtoFluxTypeObjects
             // Returning a list because there could be multiple best matches
             List<ProtoFluxTypeInfo> bestMatches = new List<ProtoFluxTypeInfo>();
             int bestMatchCount = 0;
+
+            // Preprocess words: lowercase and trim non-alphanumeric characters at the end if applicable
+            var processedWords = words.Select(word =>
+            {
+                // Convert the word to lowercase
+                string lowerCasedWord = word.ToLowerInvariant();
+
+                // If the word is more than one character long and ends with a non-alphanumeric character,
+                // remove the last character
+                if (lowerCasedWord.Length > 1 && !char.IsLetterOrDigit(lowerCasedWord[^1]))
+                {
+                    lowerCasedWord = lowerCasedWord.Substring(0, lowerCasedWord.Length - 1);
+                }
+
+                return lowerCasedWord;
+            }).ToList();
+
             foreach (var typeInfo in typeInfos)
             {
-                int matchCount = words.Count(word => typeInfo.WordsOfNiceName.Contains(word));
+                // Count how many words match (after preprocessing) with the current typeInfo's WordsOfNiceNameLowerCased
+                int matchCount = processedWords.Count(word => typeInfo.WordsOfNiceNameLowerCased.Contains(word));
+
                 if (matchCount > bestMatchCount)
                 {
-                    bestMatches.Clear(); // Clear previous best matches as we found a better match
-                    bestMatches.Add(typeInfo); // Add this typeInfo as the current best match
-                    bestMatchCount = matchCount; // Update the best match count
+                    // Clear previous best matches as we found a better match
+                    bestMatches.Clear();
+                    // Add this typeInfo as the current best match
+                    bestMatches.Add(typeInfo);
+                    // Update the best match count
+                    bestMatchCount = matchCount;
                 }
                 else if (matchCount == bestMatchCount && bestMatchCount > 0)
                 {
@@ -53,15 +67,8 @@ namespace VoiceToProtoFlux.Objects.ProtoFluxTypeObjects
                     bestMatches.Add(typeInfo);
                 }
             }
-            return bestMatches; // Return the list of best matches (can be empty if no matches found)
-        }
-
-
-
-        public ProtoFluxTypeInfo? GetTypeInfoByPhrase(string phrase)
-        {
-            phraseMap.TryGetValue(phrase, out ProtoFluxTypeInfo? typeInfo);
-            return typeInfo;
+            // Return the list of best matches (can be empty if no matches found)
+            return bestMatches;
         }
 
         public ProtoFluxTypeInfo? GetTypeInfoByNicePath(string nicePath)

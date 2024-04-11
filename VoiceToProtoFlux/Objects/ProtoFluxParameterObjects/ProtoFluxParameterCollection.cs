@@ -10,7 +10,6 @@ namespace VoiceToProtoFlux.Objects
 
         private ProtoFluxParameterCollection()
         {
-            // Assuming case sensitivity is not required for the initialization
             Parameters = new Dictionary<string, ProtoFluxParameter>(System.StringComparer.OrdinalIgnoreCase)
             {
                 { "Int", new ProtoFluxParameter("Int") },

@@ -29,46 +29,6 @@ namespace VoiceToProtoFluxTests
             Assert.IsTrue(uniqueWords.Contains("Word3"), "Word3 is missing.");
         }
 
-        /// <summary>
-        /// Tests that adding a ProtoFluxTypeInfo object with a phrase to the collection
-        /// and then retrieving it by that phrase returns the correct object.
-        /// </summary>
-        [TestMethod]
-        public void Test_AddTypeInfo_And_GetTypeInfoByPhrase()
-        {
-            // Arrange: Create a collection and add a ProtoFluxTypeInfo object with a specific phrase.
-            var collection = new ProtoFluxTypeInfoCollection();
-            var typeInfo = new ProtoFluxTypeInfo("FullName", "NiceName", "Category", "NiceCategory", 0, new List<string> { "Test" });
-            typeInfo.Phrases.Add("TestPhrase");
-            collection.AddTypeInfo(typeInfo);
-
-            // Act: Retrieve the ProtoFluxTypeInfo object by the phrase.
-            var retrievedTypeInfo = collection.GetTypeInfoByPhrase("TestPhrase");
-
-            // Assert: Verify the retrieved object matches the one added.
-            Assert.IsNotNull(retrievedTypeInfo, "TypeInfo should not be null for existing phrase.");
-            Assert.AreEqual(typeInfo.FullName, retrievedTypeInfo.FullName, "Retrieved TypeInfo does not match the added TypeInfo.");
-        }
-
-        /// <summary>
-        /// Tests that attempting to retrieve a ProtoFluxTypeInfo object by a nonexistent phrase returns null.
-        /// </summary>
-        [TestMethod]
-        public void Test_GetTypeInfoByPhrase_ReturnsNullForNonexistentPhrase()
-        {
-            // Arrange: Create a collection and add a ProtoFluxTypeInfo object with a specific phrase.
-            var collection = new ProtoFluxTypeInfoCollection();
-            var typeInfo = new ProtoFluxTypeInfo("FullName", "NiceName", "Category", "NiceCategory", 0, new List<string> { "Test" });
-            typeInfo.Phrases.Add("TestPhrase");
-            collection.AddTypeInfo(typeInfo);
-
-            // Act: Attempt to retrieve a ProtoFluxTypeInfo object by a nonexistent phrase.
-            var retrievedTypeInfo = collection.GetTypeInfoByPhrase("NonexistentPhrase");
-
-            // Assert: Verify that null is returned.
-            Assert.IsNull(retrievedTypeInfo, "TypeInfo should be null for nonexistent phrase.");
-        }
-
 
         [TestMethod]
         public void FindBestMatchingTypeInfoByWords_ReturnsAllBestMatches()
@@ -118,6 +78,46 @@ namespace VoiceToProtoFluxTests
             Assert.AreEqual(1, bestMatch.Count, "Should return a single best match when one exists.");
             Assert.AreEqual("FullName1", bestMatch[0].FullName, "The FullName1 type info should be the best and only match.");
         }
+
+
+        [TestMethod]
+        public void FindBestMatchingTypeInfoByWords_HandlesMixedCasingAndNonAlphanumeric()
+        {
+            // Arrange
+            var collection = new ProtoFluxTypeInfoCollection();
+            collection.AddTypeInfo(new ProtoFluxTypeInfo("FullName1", "NiceName1", "Category1", "NiceCategory1", 0, new List<string> { "word1" }));
+            collection.AddTypeInfo(new ProtoFluxTypeInfo("FullName2", "NiceName2", "Category2", "NiceCategory2", 0, new List<string> { "word2" }));
+
+            // Act
+            var bestMatch = collection.FindBestMatchingTypeInfoByWords(new List<string> { "Word1!" });
+
+            // Assert
+            Assert.AreEqual(1, bestMatch.Count, "Should return a single best match when one exists, handling mixed casing and non-alphanumeric characters.");
+            Assert.AreEqual("FullName1", bestMatch[0].FullName, "The FullName1 type info should be the best and only match.");
+        }
+
+        [TestMethod]
+        public void FindBestMatchingTypeInfoByWords_PreprocessingEnsuresCorrectMatching()
+        {
+            // Arrange
+            var collection = new ProtoFluxTypeInfoCollection();
+            collection.AddTypeInfo(new ProtoFluxTypeInfo("FullName1", "NiceName1", "Category1", "NiceCategory1", 0, new List<string> { "preprocess" }));
+            collection.AddTypeInfo(new ProtoFluxTypeInfo("FullName2", "NiceName2", "Category2", "NiceCategory2", 0, new List<string> { "preprocessed" }));
+
+            // Words with and without the non-alphanumeric characters
+            var wordsWithNonAlphaNumeric = new List<string> { "preprocess!" };
+            var wordsWithoutNonAlphaNumeric = new List<string> { "preprocess" };
+
+            // Act
+            var bestMatchWith = collection.FindBestMatchingTypeInfoByWords(wordsWithNonAlphaNumeric);
+            var bestMatchWithout = collection.FindBestMatchingTypeInfoByWords(wordsWithoutNonAlphaNumeric);
+
+            // Assert
+            Assert.AreEqual(1, bestMatchWith.Count, "Preprocessing should allow matching words with trailing non-alphanumeric characters.");
+            Assert.AreEqual(1, bestMatchWithout.Count, "Should return the same result regardless of trailing non-alphanumeric characters.");
+            Assert.AreEqual(bestMatchWith[0].FullName, bestMatchWithout[0].FullName, "Both preprocessing scenarios should match the same type info.");
+        }
+
 
 
 

@@ -9,11 +9,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Objects\SpeechTranscriberObjects\SpeechTranscriber.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="ProtoFluxTypes.json" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Resources\ProtoFluxTypes.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Objects\SpeechTranscriberObjects\SpeechTranscriber.cs" />
   </ItemGroup>
 
   <ItemGroup>

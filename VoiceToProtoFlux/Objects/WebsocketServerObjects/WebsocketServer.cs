@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
 
-namespace VoiceToProtoFlux.Objects
+namespace VoiceToProtoFlux.Objects.WebsocketServerObjects
 {
     public class WebSocketServer
     {

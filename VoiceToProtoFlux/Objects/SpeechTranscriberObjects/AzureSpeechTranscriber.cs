@@ -3,7 +3,10 @@ using Microsoft.CognitiveServices.Speech;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using VoiceToProtoFlux.Objects.ProtoFluxParameterObjects;
 using VoiceToProtoFlux.Objects.ProtoFluxTypeObjects;
+using VoiceToProtoFlux.Objects.TranscriptionObjects;
+using VoiceToProtoFlux.Objects.WebsocketServerObjects;
 
 namespace VoiceToProtoFlux.Objects.SpeechTranscriberObjects
 {
@@ -11,10 +14,14 @@ namespace VoiceToProtoFlux.Objects.SpeechTranscriberObjects
     {
         private SpeechRecognizer recognizer;
         private ConfigManager configManager;
+        private ProtoFluxTypeInfoCollection protoFluxTypeInfoCollection;
+        private WebSocketServer webSocketServer;
 
-        public AzureSpeechTranscriber(ConfigManager configManager, List<string> grammarPhrases)
+        public AzureSpeechTranscriber(ConfigManager configManager, WebSocketServer webSocketServer, ProtoFluxTypeInfoCollection protoFluxTypeInfoCollection, List<string> grammarPhrases)
         {
             this.configManager = configManager;
+            this.webSocketServer = webSocketServer;
+            this.protoFluxTypeInfoCollection = protoFluxTypeInfoCollection;
             InitializeSpeechRecognizer(grammarPhrases);
         }
 
@@ -39,11 +46,63 @@ namespace VoiceToProtoFlux.Objects.SpeechTranscriberObjects
             recognizer.SessionStarted += OnSessionStarted;
         }
 
-        private void OnRecognized(object sender, SpeechRecognitionEventArgs e)
+        private async void OnRecognized(object sender, SpeechRecognitionEventArgs e)
         {
             if (e.Result.Reason == ResultReason.RecognizedSpeech)
             {
-                Debug.WriteLine($"Recognized: {e.Result.Text}");
+                Debug.WriteLine($"Recognized text: {e.Result.Text}");
+
+                // Split the recognized text into individual words
+                List<string> recognizedWords = e.Result.Text.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                Debug.WriteLine($"Recognized words: {string.Join(", ", recognizedWords)}");
+
+                // Initialize typeWords and parameterWords as empty lists
+                List<string> typeWords = new List<string>();
+                List<string> parameterWords = new List<string>();
+
+                // Attempt to locate the last occurrence of "of" followed by "type"
+                int lastOfTypeIndex = recognizedWords.FindLastIndex(word => word.Equals("of", StringComparison.OrdinalIgnoreCase));
+                if (lastOfTypeIndex != -1 && lastOfTypeIndex + 1 < recognizedWords.Count && recognizedWords[lastOfTypeIndex + 1].Equals("type", StringComparison.OrdinalIgnoreCase))
+                {
+                    // Take all words up until the last "of type"
+                    typeWords = recognizedWords.Take(lastOfTypeIndex).ToList();
+
+                    // Take all words after the last "of type"
+                    if (lastOfTypeIndex + 2 < recognizedWords.Count) // Check if there are words after the last "of type"
+                    {
+                        parameterWords = recognizedWords.Skip(lastOfTypeIndex + 2).ToList(); // Skip the last "of" and "type", take the rest
+                    }
+                }
+                else
+                {
+                    // If "of type" is not found, consider all recognized words as type words
+                    typeWords = new List<string>(recognizedWords);
+                }
+
+                // Debug output for verification
+                Debug.WriteLine($"Type words: {string.Join(", ", typeWords)}");
+                Debug.WriteLine($"Parameter words: {string.Join(", ", parameterWords)}");
+
+                List<ProtoFluxTypeInfo> bestTypeMatches = protoFluxTypeInfoCollection.FindBestMatchingTypeInfoByWords(typeWords);
+                if (bestTypeMatches.Count == 0)
+                {
+                    Debug.WriteLine("No type matches found.");
+                    return;
+                }
+                ProtoFluxTypeInfo bestTypeMatch = bestTypeMatches[0];
+
+                Debug.WriteLine($"Best type match: {bestTypeMatch.FullName}");
+
+                List<ProtoFluxParameter> protoFluxParameters = new List<ProtoFluxParameter>();
+
+                Transcription transcription = new Transcription(protoFluxTypeInfo: bestTypeMatch, providedParameters: protoFluxParameters);
+
+                await webSocketServer.BroadcastMessageAsync(transcription.ToWebsocketString());
+
+            }
+            else
+            { 
+                
             }
         }
 

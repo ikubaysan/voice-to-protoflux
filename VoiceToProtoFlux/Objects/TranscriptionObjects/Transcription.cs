@@ -12,14 +12,12 @@ namespace VoiceToProtoFlux.Objects.TranscriptionObjects
     {
         public ProtoFluxTypeInfo ProtoFluxTypeInfo { get; set; }
         public List<ProtoFluxParameter> ProvidedParameters { get; set; }
-        public float Confidence { get; set; }
 
 
-        public Transcription(ProtoFluxTypeInfo protoFluxTypeInfo, List<ProtoFluxParameter> providedParameters, float confidence)
+        public Transcription(ProtoFluxTypeInfo protoFluxTypeInfo, List<ProtoFluxParameter> providedParameters)
         {
             ProtoFluxTypeInfo = protoFluxTypeInfo;
             ProvidedParameters = providedParameters;
-            Confidence = confidence;
         }
 
         public string ToWebsocketString()
@@ -58,7 +56,7 @@ namespace VoiceToProtoFlux.Objects.TranscriptionObjects
 
         public override string ToString()
         {
-            return $"{ProtoFluxTypeInfo.FullName} (Confidence: {Confidence:N2})";
+            return $"{ProtoFluxTypeInfo.FullName} w/ {ProvidedParameters} parameters: {string.Join(", ", ProvidedParameters.Select(p => p.Name))}";
         }
     }
 }

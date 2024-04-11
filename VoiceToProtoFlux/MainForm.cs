@@ -7,12 +7,12 @@ using VoiceToProtoFlux.Objects.ProtoFluxTypeObjects;
 using VoiceToProtoFlux.Objects;
 using System.Speech.Recognition;
 using VoiceToProtoFlux.Objects.SpeechTranscriberObjects;
+using VoiceToProtoFlux.Objects.WebsocketServerObjects;
 
 namespace VoiceToProtoFlux
 {
     public partial class MainForm : Form
     {
-        private SpeechTranscriber speechTranscriber;
         private string defaultMicrophoneName = "Unknown Microphone";
         private WebSocketServer webSocketServer;
         private ConfigManager configManager;
@@ -42,19 +42,30 @@ namespace VoiceToProtoFlux
         private void Form1_Shown(object sender, EventArgs e)
         {
             configManager.LoadConfig(); // Now this is called when the form is shown
-            
+
             // Convert HashSet to List
-            var grammarWords = typeInfoCollection.GetUniqueWordsOfNiceNames().ToList();
+            HashSet<string> grammarWords = typeInfoCollection.GetUniqueWordsOfNiceNames();
 
             List<string> additionalWords = new List<string>
             {
                 "Of",
                 "Type"
             };
-            
-            // Pass the list to AzureSpeechTranscriber
-            azureSpeechTranscriber = new AzureSpeechTranscriber(configManager, grammarWords);
 
+            foreach (string word in additionalWords)
+            {
+                grammarWords.Add(word);
+            }
+
+            SynonymManager.GetAllWords().ForEach(word => grammarWords.Add(word));
+
+            // Pass the list to AzureSpeechTranscriber
+            azureSpeechTranscriber = new AzureSpeechTranscriber(
+                configManager, 
+                webSocketServer,
+                typeInfoCollection, 
+                grammarWords.ToList()
+                );
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -65,19 +76,8 @@ namespace VoiceToProtoFlux
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            // Initialize labels to their default states
-            isAudioDetectedLabel.Text = "Audio is not currently detected";
-            isAudioDetectedLabel.ForeColor = Color.Red;
-            isAudioDetectionConfirmedLabel.Text = "Audio detection not confirmed";
-            isAudioDetectionConfirmedLabel.ForeColor = Color.Red;
-
             transcriptionEnabledCheckBox.Checked = false;
             return;
-        }
-
-        private void SpeechTranscriber_AudioLevelUpdated(object? sender, AudioLevelUpdatedEventArgs e)
-        {
-            UpdateAudioDetectionLabel(e.AudioLevel > 0);
         }
 
         private void IdentifyDefaultMicrophone()
@@ -98,29 +98,6 @@ namespace VoiceToProtoFlux
             defaultMicrophoneNameLabel.Text = $"Your default mic: {defaultMicrophoneName}";
         }
 
-        private void UpdateAudioDetectionLabel(bool detected)
-        {
-            if (this.InvokeRequired)
-            {
-                this.Invoke(new Action<bool>(UpdateAudioDetectionLabel), new object[] { detected });
-                return;
-            }
-
-            if (detected)
-            {
-                isAudioDetectedLabel.Text = "Audio is currently detected";
-                isAudioDetectedLabel.ForeColor = Color.Green;
-                // As soon as we detect any audio, we can confirm that the audio detection is working
-                isAudioDetectionConfirmedLabel.Text = $"Audio detection confirmed for {defaultMicrophoneName}.";
-                isAudioDetectionConfirmedLabel.ForeColor = Color.Green;
-            }
-            else
-            {
-                isAudioDetectedLabel.Text = "Audio not currently detected";
-                isAudioDetectedLabel.ForeColor = Color.Red;
-            }
-        }
-
         private void transcriptionEnabledCheckBox_Click(object sender, EventArgs e)
         {
             if (transcriptionEnabledCheckBox.Checked)
@@ -134,8 +111,6 @@ namespace VoiceToProtoFlux
                 azureSpeechTranscriber.StopRecognitionAsync();
             }
         }
-
-
 
         private async void EnableTranscription()
         {
@@ -170,9 +145,5 @@ namespace VoiceToProtoFlux
                 }
             }
         }
-
-
-
-
     }
 }

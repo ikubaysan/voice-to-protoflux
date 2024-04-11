@@ -28,58 +28,30 @@
         /// </summary>
         private void InitializeComponent()
         {
-            defaultMicrophoneNameLabel = new Label();
-            isAudioDetectedLabel = new Label();
-            isAudioDetectionConfirmedLabel = new Label();
             rawTranscriptionListBox = new ListBox();
             transcriptionEnabledCheckBox = new CheckBox();
             label2 = new Label();
             label3 = new Label();
             interpretedTranscriptionListBox = new ListBox();
+            defaultMicrophoneNameLabel = new Label();
             SuspendLayout();
-            // 
-            // defaultMicrophoneNameLabel
-            // 
-            defaultMicrophoneNameLabel.AutoSize = true;
-            defaultMicrophoneNameLabel.Location = new Point(53, 29);
-            defaultMicrophoneNameLabel.Name = "defaultMicrophoneNameLabel";
-            defaultMicrophoneNameLabel.Size = new Size(103, 15);
-            defaultMicrophoneNameLabel.TabIndex = 0;
-            defaultMicrophoneNameLabel.Text = "Default Mic Name";
-            // 
-            // isAudioDetectedLabel
-            // 
-            isAudioDetectedLabel.AutoSize = true;
-            isAudioDetectedLabel.Location = new Point(53, 195);
-            isAudioDetectedLabel.Name = "isAudioDetectedLabel";
-            isAudioDetectedLabel.Size = new Size(105, 15);
-            isAudioDetectedLabel.TabIndex = 2;
-            isAudioDetectedLabel.Text = "Is Audio Detected?";
-            // 
-            // isAudioDetectionConfirmedLabel
-            // 
-            isAudioDetectionConfirmedLabel.AutoSize = true;
-            isAudioDetectionConfirmedLabel.Location = new Point(53, 226);
-            isAudioDetectionConfirmedLabel.Name = "isAudioDetectionConfirmedLabel";
-            isAudioDetectionConfirmedLabel.Size = new Size(105, 15);
-            isAudioDetectionConfirmedLabel.TabIndex = 3;
-            isAudioDetectionConfirmedLabel.Text = "Is Audio Detected?";
             // 
             // rawTranscriptionListBox
             // 
             rawTranscriptionListBox.FormattingEnabled = true;
-            rawTranscriptionListBox.ItemHeight = 15;
-            rawTranscriptionListBox.Location = new Point(53, 330);
+            rawTranscriptionListBox.Location = new Point(61, 440);
+            rawTranscriptionListBox.Margin = new Padding(3, 4, 3, 4);
             rawTranscriptionListBox.Name = "rawTranscriptionListBox";
-            rawTranscriptionListBox.Size = new Size(404, 229);
+            rawTranscriptionListBox.Size = new Size(461, 304);
             rawTranscriptionListBox.TabIndex = 4;
             // 
             // transcriptionEnabledCheckBox
             // 
             transcriptionEnabledCheckBox.AutoSize = true;
-            transcriptionEnabledCheckBox.Location = new Point(53, 256);
+            transcriptionEnabledCheckBox.Location = new Point(61, 341);
+            transcriptionEnabledCheckBox.Margin = new Padding(3, 4, 3, 4);
             transcriptionEnabledCheckBox.Name = "transcriptionEnabledCheckBox";
-            transcriptionEnabledCheckBox.Size = new Size(140, 19);
+            transcriptionEnabledCheckBox.Size = new Size(175, 24);
             transcriptionEnabledCheckBox.TabIndex = 5;
             transcriptionEnabledCheckBox.Text = "transcriptionEnabled?";
             transcriptionEnabledCheckBox.UseVisualStyleBackColor = true;
@@ -88,44 +60,52 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(196, 299);
+            label2.Location = new Point(224, 399);
             label2.Name = "label2";
-            label2.Size = new Size(100, 15);
+            label2.Size = new Size(125, 20);
             label2.TabIndex = 6;
             label2.Text = "Raw Transcription";
             // 
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(670, 299);
+            label3.Location = new Point(766, 399);
             label3.Name = "label3";
-            label3.Size = new Size(136, 15);
+            label3.Size = new Size(171, 20);
             label3.TabIndex = 8;
             label3.Text = "Interpreted Transcription";
             // 
             // interpretedTranscriptionListBox
             // 
             interpretedTranscriptionListBox.FormattingEnabled = true;
-            interpretedTranscriptionListBox.ItemHeight = 15;
-            interpretedTranscriptionListBox.Location = new Point(527, 330);
+            interpretedTranscriptionListBox.Location = new Point(602, 440);
+            interpretedTranscriptionListBox.Margin = new Padding(3, 4, 3, 4);
             interpretedTranscriptionListBox.Name = "interpretedTranscriptionListBox";
-            interpretedTranscriptionListBox.Size = new Size(404, 229);
+            interpretedTranscriptionListBox.Size = new Size(461, 304);
             interpretedTranscriptionListBox.TabIndex = 7;
             // 
-            // Form1
+            // defaultMicrophoneNameLabel
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            defaultMicrophoneNameLabel.AutoSize = true;
+            defaultMicrophoneNameLabel.Location = new Point(61, 39);
+            defaultMicrophoneNameLabel.Name = "defaultMicrophoneNameLabel";
+            defaultMicrophoneNameLabel.Size = new Size(130, 20);
+            defaultMicrophoneNameLabel.TabIndex = 0;
+            defaultMicrophoneNameLabel.Text = "Default Mic Name";
+            // 
+            // MainForm
+            // 
+            AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1067, 571);
+            ClientSize = new Size(1219, 761);
             Controls.Add(label3);
             Controls.Add(interpretedTranscriptionListBox);
             Controls.Add(label2);
             Controls.Add(transcriptionEnabledCheckBox);
             Controls.Add(rawTranscriptionListBox);
-            Controls.Add(isAudioDetectionConfirmedLabel);
-            Controls.Add(isAudioDetectedLabel);
             Controls.Add(defaultMicrophoneNameLabel);
-            Name = "Form1";
+            Margin = new Padding(3, 4, 3, 4);
+            Name = "MainForm";
             Text = "Form1";
             Load += Form1_Load;
             ResumeLayout(false);
@@ -133,14 +113,11 @@
         }
 
         #endregion
-
-        private Label defaultMicrophoneNameLabel;
-        private Label isAudioDetectedLabel;
-        private Label isAudioDetectionConfirmedLabel;
         private ListBox rawTranscriptionListBox;
         private CheckBox transcriptionEnabledCheckBox;
         private Label label2;
         private Label label3;
         private ListBox interpretedTranscriptionListBox;
+        private Label defaultMicrophoneNameLabel;
     }
 }
