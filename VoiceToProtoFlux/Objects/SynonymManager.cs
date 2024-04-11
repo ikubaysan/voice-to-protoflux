@@ -28,6 +28,19 @@ namespace VoiceToProtoFlux.Objects
             {"uri", new List<string> { "URL" }}
         };
 
+
+        public static List<string> GetAllWords()
+        {
+            List<string> allWords = new List<string>();
+            foreach (var word in synonyms.Keys)
+            {
+                allWords.Add(word);
+                allWords.AddRange(synonyms[word]);
+            }
+            return allWords;
+        }
+
+
         // Since we no longer have a constructor, we initialize the dictionary directly above.
 
         public static IEnumerable<string> GetSynonyms(string word)

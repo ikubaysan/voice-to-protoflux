@@ -20,6 +20,14 @@ namespace VoiceToProtoFluxTests
             var synonymsForUint = SynonymManager.GetSynonyms("uint");
             Assert.IsTrue(synonymsForUint.Contains("UnsignedInt") && synonymsForUint.Contains("UnsignedInteger"), "Synonyms for uint are missing or incorrect");
         }
+
+        [TestMethod]
+        public void GetAllWords()
+        {
+            List<string> allWords = SynonymManager.GetAllWords();
+            Assert.IsTrue(allWords.Contains("ulong"), "ulong is missing");
+        }
+
     }
 
 }

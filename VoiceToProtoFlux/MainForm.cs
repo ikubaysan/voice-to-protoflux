@@ -17,6 +17,7 @@ namespace VoiceToProtoFlux
         private WebSocketServer webSocketServer;
         private ConfigManager configManager;
         private AzureSpeechTranscriber azureSpeechTranscriber;
+        private ProtoFluxTypeInfoCollection typeInfoCollection;
 
         public MainForm()
         {
@@ -28,7 +29,7 @@ namespace VoiceToProtoFlux
             webSocketServer = new WebSocketServer("http://localhost:7159/");
             Task.Run(() => webSocketServer.StartAsync());
 
-            ProtoFluxTypeInfoCollection typeInfoCollection = ProtoFluxTypeLoader.LoadProtoFluxTypes();
+            typeInfoCollection = ProtoFluxTypeLoader.LoadProtoFluxTypes();
 
             /*
             speechTranscriber = new SpeechTranscriber(rawTranscriptionListBox, typeInfoCollection, webSocketServer);
@@ -41,7 +42,19 @@ namespace VoiceToProtoFlux
         private void Form1_Shown(object sender, EventArgs e)
         {
             configManager.LoadConfig(); // Now this is called when the form is shown
-            azureSpeechTranscriber = new AzureSpeechTranscriber(configManager);
+            
+            // Convert HashSet to List
+            var grammarWords = typeInfoCollection.GetUniqueWordsOfNiceNames().ToList();
+
+            List<string> additionalWords = new List<string>
+            {
+                "Of",
+                "Type"
+            };
+            
+            // Pass the list to AzureSpeechTranscriber
+            azureSpeechTranscriber = new AzureSpeechTranscriber(configManager, grammarWords);
+
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
