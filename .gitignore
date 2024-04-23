@@ -3,12 +3,12 @@
 ################################################################################
 
 /VoiceToProtoFlux/.vs/VoiceToProtoFlux/FileContentIndex
-/VoiceToProtoFlux/bin/Debug/net8.0-windows
+/VoiceToProtoFlux/bin/
 /VoiceToProtoFlux/obj
 *.user
 /VoiceToProtoFlux/.vs/VoiceToProtoFlux/v17
 /VoiceToProtoFlux/.vs/VoiceToProtoFlux/DesignTimeBuild/.dtbcache.v2
 /VoiceToProtoFlux/.vs/ProjectEvaluation
 /VoiceToProtoFluxTests/obj
-/VoiceToProtoFluxTests/bin/Debug/net8.0-windows
+/VoiceToProtoFluxTests/bin/
 .idea/
